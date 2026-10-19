@@ -1,0 +1,231 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Rexburg After Class: activities near BYU-Idaho</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,800&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#FFF8EC;--panel:#FFFFFF;--ink:#1B2A41;--muted:#66758A;--line:#F0E4CF;--brand:#2D7FF9;--ember:#FF5A4F;--ring:#BFE3CE;--mapbg:#E3F6EA;--shadow:0 2px 0 rgba(27,42,65,.04),0 8px 22px rgba(27,42,65,.10);color-scheme:light;box-sizing:border-box}
+*,*::before,*::after{box-sizing:border-box}
+html,body{height:100%}
+body{margin:0;background:#FFE9B8;color:var(--ink);font-family:"Bricolage Grotesque",system-ui,-apple-system,"Segoe UI",sans-serif;line-height:1.4;-webkit-text-size-adjust:100%;-webkit-tap-highlight-color:transparent}
+a{color:var(--brand)}
+button,select,input{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--brand);outline-offset:2px}
+.app{max-width:480px;height:100vh;height:100dvh;margin:0 auto;background:var(--bg);display:flex;flex-direction:column;overflow:hidden}
+@media (min-width:600px){body{display:grid;place-items:center}.app{height:min(880px,calc(100dvh - 32px));border-radius:36px;box-shadow:0 20px 50px rgba(255,140,60,.35);border:6px solid #fff;width:100%}}
+.bar{flex:none;padding:calc(env(safe-area-inset-top,0px) + 16px) 20px 18px;background:linear-gradient(135deg,#2D7FF9 0%,#12B5A6 70%,#7BDC8A 100%);color:#fff;border-radius:0 0 28px 28px}
+.bar h1{margin:0;font-size:1.7rem;font-weight:800;letter-spacing:-.02em;line-height:1.05}
+.bar span{display:block;margin-top:4px;font-size:.95rem;opacity:.95}
+.view{flex:1;min-height:0;overflow-y:auto;-webkit-overflow-scrolling:touch;padding-bottom:12px}
+#v-map:not([hidden]){display:flex;flex-direction:column;overflow:hidden;padding-bottom:0}
+.sum{margin:14px 20px 4px;font-weight:800;font-size:1.05rem}
+.sum span{color:var(--muted);font-weight:400}
+.controls{display:grid;gap:18px;margin:14px 12px;padding:18px;background:var(--panel);border-radius:24px;box-shadow:var(--shadow)}
+.lab{font-weight:800;font-size:.95rem;margin-bottom:8px;display:block}
+.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.scroll{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;margin:0 -18px;padding:2px 18px}
+.scroll::-webkit-scrollbar{display:none}
+.chip{flex:none;border:2px solid var(--line);background:#fff;border-radius:999px;padding:9px 16px;min-height:44px;cursor:pointer;font-size:.95rem;font-weight:600}
+.chip[aria-pressed="true"]{background:var(--brand);color:#fff;border-color:var(--brand)}
+select{border:2px solid var(--line);background:#fff;border-radius:999px;padding:9px 14px;min-height:44px;flex:1;font-weight:600}
+input[type=range]{flex:1;min-width:120px;height:36px;accent-color:var(--ember)}
+.hrs{font-weight:800;font-size:1.6rem;min-width:70px;text-align:right;color:var(--ember)}
+#list{padding:8px 12px 12px;display:grid;gap:14px}
+.item{display:block;padding:16px;background:var(--panel);border-radius:24px;box-shadow:var(--shadow);cursor:pointer;border:3px solid transparent}
+.item.sel{border-color:var(--c)}
+.item.off{opacity:.55}
+.t{display:inline-flex;align-items:baseline;gap:8px;background:var(--c);color:#fff;border-radius:999px;padding:6px 14px;font-weight:800;font-size:1.05rem;margin-bottom:10px}
+.t small{font-size:.8rem;font-weight:600;color:#fff;opacity:.95;margin:0}
+.item h2{margin:0 0 4px;font-size:1.25rem;font-weight:800;display:flex;align-items:center;gap:10px}
+.em{flex:none;width:38px;height:38px;border-radius:12px;display:grid;place-items:center;font-size:1.3rem}
+.item p{margin:0 0 10px;color:var(--muted);font-size:.95rem}
+.meta{display:flex;flex-wrap:wrap;gap:4px 12px;font-size:.88rem;margin-bottom:4px}
+.meta b{font-weight:700}
+.now{color:#0B9B5B;font-weight:800}
+.go{display:block;margin-top:12px;text-align:center;text-decoration:none;font-weight:800;background:var(--brand);color:#fff;border-radius:16px;padding:14px}
+.empty{padding:28px 16px;color:var(--muted);text-align:center}
+.foot{margin:0;padding:4px 24px 16px;color:var(--muted);font-size:.8rem;text-align:center}
+.zoom{padding:12px 12px 0}
+.zoom .scroll{margin:0 -12px;padding:2px 12px}
+.mapbox{flex:1;min-height:200px;margin:12px;background:var(--mapbg);border-radius:24px;box-shadow:var(--shadow);overflow:hidden}
+#map{width:100%;height:100%;display:block}
+.sheet{flex:none;max-height:42%;overflow:auto;margin:0 12px 12px;padding:16px;background:var(--panel);border-radius:24px;box-shadow:var(--shadow)}
+.sheet .item{padding:0;box-shadow:none;cursor:default;border:0}
+.sheet .go2{display:block;width:100%;margin-top:8px;border:0;background:#FFF1D6;color:var(--ink);font-weight:700;border-radius:14px;padding:13px;cursor:pointer}
+.nav{flex:none;display:grid;grid-template-columns:repeat(3,1fr);gap:6px;background:#fff;border-top:2px solid var(--line);padding:8px 10px calc(env(safe-area-inset-bottom,0px) + 8px)}
+.nav button{border:0;background:none;display:grid;justify-items:center;gap:2px;padding:8px 4px;border-radius:16px;cursor:pointer;color:var(--muted);font-size:.8rem;font-weight:700}
+.nav button svg{width:26px;height:26px}
+.nav button[aria-selected="true"]{color:var(--brand);background:#E6F0FF}
+[hidden]{display:none!important}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
+
+.controls{gap:20px}
+#modes,#cats,#zoom{display:grid;gap:8px;overflow:visible;margin:0;padding:0}
+#modes{grid-template-columns:repeat(3,1fr)}
+#zoom{grid-template-columns:repeat(4,1fr)}
+#cats{grid-template-columns:repeat(2,1fr)}
+#modes .chip,#cats .chip,#zoom .chip{width:100%;padding:10px 8px;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.zoom{padding:12px 12px 0}
+.ticks{display:flex;justify-content:space-between;font-size:.78rem;color:var(--muted);margin-top:-4px}
+.dayrow{display:grid;grid-template-columns:1fr auto;gap:8px}
+select{min-width:0}
+.actions{display:grid;grid-template-columns:auto 1fr;gap:10px;margin:0 12px 12px}
+.actions button{min-height:50px;border-radius:16px;border:0;font-weight:800;cursor:pointer}
+#reset{background:#fff;border:2px solid var(--line);padding:0 18px}
+#apply{background:var(--ember);color:#fff}
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="bar"><h1>Rexburg after class</h1><span>Find something fun near BYU-Idaho</span></header>
+  <div class="view" id="v-explore">
+    <p class="sum" id="sum"></p>
+    <main id="list"></main>
+    <p class="foot">Distances are straight-line from campus, scaled to road time. Hours and seasons are typical, so confirm before you go.</p>
+  </div>
+  <div class="view" id="v-map" hidden>
+    <div class="zoom"><div id="zoom" class="scroll"></div></div>
+    <div class="mapbox"><svg id="map" viewBox="0 0 520 560" role="img" aria-label="Map of activities around campus"></svg></div>
+    <div class="sheet" id="sheet"></div>
+  </div>
+  <div class="view" id="v-filters" hidden>
+    <section class="controls" aria-label="Filters">
+      <div class="row"><span class="lab" style="margin:0">How much time do you have?</span><input id="budget" type="range" min="1" max="12" value="3" aria-label="Hours available"><span class="hrs" id="bl">3 hr</span></div><div class="ticks" aria-hidden="true"><span>1 hr</span><span>6 hr</span><span>12 hr</span></div>
+      <div><div class="lab">Getting there</div><div id="modes" class="scroll"></div></div>
+      <div><div class="lab">Day</div><div class="dayrow"><select id="day" aria-label="Day"></select><button class="chip" id="free" aria-pressed="false">Free only</button></div></div>
+      <div><div class="lab">Type</div><div id="cats" class="scroll"></div></div>
+    </section>
+    <div class="actions"><button id="reset">Reset</button><button id="apply">Show spots</button></div>
+  </div>
+  <nav class="nav" role="tablist" aria-label="Sections">
+    <button role="tab" data-tab="explore" aria-selected="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h10"/></svg>Explore</button>
+    <button role="tab" data-tab="map" aria-selected="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M12 21s7-6.2 7-11a7 7 0 1 0-14 0c0 4.8 7 11 7 11z"/><circle cx="12" cy="10" r="2.5"/></svg>Map</button>
+    <button role="tab" data-tab="filters" aria-selected="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h10M18 7h2M4 17h2M10 17h10"/><circle cx="16" cy="7" r="2"/><circle cx="8" cy="17" r="2"/></svg>Filters</button>
+  </nav>
+</div>
+<script>
+const C={lat:43.8183,lng:-111.7835};
+const CATS={outdoors:['Outdoors','#1FA463','#DDF5E6','⛰️'],water:['Water','#10A5C7','#D8F2F9','💦'],winter:['Winter','#7B61FF','#E9E4FF','⛷️'],town:['Town and campus','#2D7FF9','#DCEAFF','🎓'],trip:['Day trips','#FF7A1A','#FFE6D2','🦬']};
+const MODES={walk:'Walk',bike:'Bike',drive:'Drive'};
+const DAYS=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+// name, cat, lat, lng, cost, hours to spend, days (null=all), open hours [from,to] (null=check), season [startMonth,endMonth] (null=all), note
+const A=[
+['Devotional at the BYU-I Center','town',43.8183,-111.7835,'Free',1,[2],[11.5,12.5],null,'Weekly campus devotional. Confirm the schedule at byui.edu.'],
+['Porter Park','town',43.8236,-111.7890,'Free',1.5,null,[6,22],null,'Downtown park with lawns and a pavilion. Good for frisbee or a picnic.'],
+['Teton Flood Museum','town',43.8250,-111.7904,'$',1,null,null,null,'The story of the 1976 Teton Dam collapse and the flood through Rexburg.'],
+['Rexburg Idaho Temple grounds','town',43.8365,-111.7770,'Free',0.75,null,[6,22],null,'Quiet grounds that are good for a walk.'],
+['Rexburg Rapids','water',43.8200,-111.7970,'$',2,null,null,null,'Indoor aquatic center with pools and slides.'],
+['Beaver Dick Park','water',43.8650,-111.8300,'Free',2,null,[6,22],null,'Henrys Fork riverside for fishing, floating and picnics.'],
+['Menan Buttes','outdoors',43.7830,-111.9700,'Free',2.5,null,[6,21],null,'Huge volcanic tuff cones. The climb gives a view across the Snake River plain.'],
+['Teton Dam site overlook','outdoors',43.9140,-111.5420,'Free',1.5,null,[6,21],null,'Overlook at the place the dam failed in 1976.'],
+['St. Anthony Sand Dunes','outdoors',43.9500,-111.9100,'Free',3,null,[7,21],null,'Sandboarding and riding on the dunes. Bring your own gear.'],
+['Ririe Reservoir','water',43.5880,-111.7280,'$',4,null,[7,21],[5,9],'Boating, swimming and camping.'],
+['Heise Hot Springs','water',43.6680,-111.6620,'$',3,null,null,null,'Hot spring pools and a water slide.'],
+['Kelly Canyon','winter',43.6000,-111.6500,'$$',4,null,null,[12,3],'Small ski hill with night skiing and tubing.'],
+['Upper Mesa Falls','outdoors',44.1750,-111.2630,'$',3,null,[8,19],[5,10],'A 110-foot waterfall on the Henrys Fork with boardwalk overlooks. The road closes with snow.'],
+['Grand Targhee','winter',43.7880,-110.9590,'$$',8,null,null,null,'Ski and snowboard resort on the Wyoming side of the Tetons, with summer hiking.'],
+['Yellowstone West Entrance','trip',44.6590,-111.0970,'$$',10,null,[6,21],null,'A full-day trip. Entrance fee is charged per vehicle.']
+].map((a,i)=>{const o={id:i,name:a[0],cat:a[1],lat:a[2],lng:a[3],cost:a[4],dur:a[5],days:a[6],hrs:a[7],season:a[8],note:a[9]};
+ const R=Math.PI/180,dLa=(o.lat-C.lat)*R,dLn=(o.lng-C.lng)*R;
+ const h=Math.sin(dLa/2)**2+Math.cos(C.lat*R)*Math.cos(o.lat*R)*Math.sin(dLn/2)**2;
+ o.mi=3958.8*2*Math.asin(Math.sqrt(h));
+ o.brg=Math.atan2(dLn*Math.cos(C.lat*R),dLa);
+ return o});
+function mins(mi,mode){const r=mi*1.3;
+ if(mode==='walk')return r/3*60;
+ if(mode==='bike')return r/10*60;
+ return r/(mi<5?25:mi<30?45:55)*60+3}
+function fmt(m){m=Math.round(m);return m<60?m+' min':Math.floor(m/60)+' hr '+(m%60?m%60+' min':'')}
+function clock(h){const hh=Math.floor(h),mm=Math.round((h-hh)*60),ap=hh>=12?'pm':'am';return ((hh+11)%12+1)+(mm?':'+String(mm).padStart(2,'0'):'')+ap}
+const S={mode:'drive',cat:null,free:false,day:0,budget:3,sel:null};
+function nowBoise(){try{const p=new Intl.DateTimeFormat('en-US',{timeZone:'America/Boise',weekday:'short',hour:'numeric',minute:'numeric',hour12:false,month:'numeric'}).formatToParts(new Date());
+ const g=t=>p.find(x=>x.type===t).value;return{day:['Sun','Mon','Tue','Wed','Thu','Fri','Sat'].indexOf(g('weekday')),h:(+g('hour')%24)+(+g('minute'))/60,mo:+g('month')}}catch(e){const d=new Date();return{day:d.getDay(),h:d.getHours()+d.getMinutes()/60,mo:d.getMonth()+1}}}
+const NOW=nowBoise();S.day=NOW.day;
+function inSeason(a){if(!a.season)return true;const[s,e]=a.season,m=NOW.mo;return s<=e?(m>=s&&m<=e):(m>=s||m<=e)}
+function status(a){
+ if(!inSeason(a))return{ok:false,t:'Out of season'};
+ if(a.days&&!a.days.includes(S.day))return{ok:false,t:'Not on '+DAYS[S.day]+'s'};
+ if(!a.hrs)return{ok:true,t:'Check hours before you go'};
+ const t=clock(a.hrs[0])+' to '+clock(a.hrs[1]);
+ if(S.day===NOW.day&&NOW.h>=a.hrs[0]&&NOW.h<a.hrs[1])return{ok:true,t:t,now:true};
+ return{ok:true,t:t}}
+function compute(){return A.map(a=>{const m=mins(a.mi,S.mode),st=status(a),total=2*m+a.dur*60;
+ const vis=(!S.cat||a.cat===S.cat)&&(!S.free||a.cost==='Free');
+ return{a,m,st,total,vis,fit:st.ok&&total<=S.budget*60}}).filter(x=>x.vis).sort((p,q)=>(q.fit-p.fit)||p.m-q.m)}
+function esc(s){return s.replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]))}
+function render(){
+ const rows=compute();
+ document.getElementById('bl').textContent=S.budget+' hr';
+ const L=document.getElementById('list');
+ if(!rows.length){L.innerHTML='<p class="empty">Nothing matches. Turn off a filter to see more.</p>'}
+ else L.innerHTML=rows.map(card).join('');
+ drawMap(rows);summary(rows)}
+function card(r){const a=r.a,c=CATS[a.cat][1];
+  const why=!r.st.ok?r.st.t:(!r.fit?'Needs '+fmt(r.total)+' round trip with the visit':'');
+  const url='https://www.google.com/maps/dir/?api=1&origin='+C.lat+','+C.lng+'&destination='+a.lat+','+a.lng+'&travelmode='+(S.mode==='bike'?'bicycling':S.mode==='walk'?'walking':'driving');
+  return '<article class="item'+(r.fit?'':' off')+(S.sel===a.id?' sel':'')+'" style="--c:'+c+'" data-id="'+a.id+'" id="i'+a.id+'">'+
+  '<div class="t">'+fmt(r.m)+'<small>'+MODES[S.mode].toLowerCase()+', '+(a.mi<10?a.mi.toFixed(1):Math.round(a.mi))+' mi</small></div>'+
+  '<div><h2><span class="em" style="background:'+CATS[a.cat][2]+'">'+CATS[a.cat][3]+'</span>'+esc(a.name)+'</h2><p>'+esc(a.note)+'</p><div class="meta"><span><b>'+CATS[a.cat][0]+'</b></span><span>'+a.cost+'</span><span>Plan on '+a.dur+' hr there</span>'+
+  '<span'+(r.st.now?' class="now"':'')+'>'+(r.st.now?'Open now, ':'')+r.st.t+'</span></div>'+
+  (why?'<div class="meta"><span>'+esc(why)+'</span></div>':'')+
+  '<a class="go" href="'+url+'" target="_blank" rel="noopener">Get directions</a></div></article>'}
+const ZOOMS={town:['Town',3],near:['Nearby',15],region:['Region',45],far:['Far',90]};
+S.zoom='region';S.tab='explore';
+let LAST=[];
+function drawMap(rows){
+ LAST=rows;
+ const W=520,H=560,cx=W/2,cy=H/2,rad=ZOOMS[S.zoom][1],k=230/rad,mpd=69.17*Math.cos(C.lat*Math.PI/180);
+ const step={town:1,near:5,region:15,far:30}[S.zoom];
+ let s='<rect width="'+W+'" height="'+H+'" fill="var(--mapbg)"/>';
+ for(let i=-Math.floor(rad*1.3/step);i<=Math.floor(rad*1.3/step);i++){const o=i*step*k;
+  s+='<line x1="'+(cx+o)+'" y1="0" x2="'+(cx+o)+'" y2="'+H+'" stroke="var(--ring)" stroke-width="1" opacity=".6"/><line x1="0" y1="'+(cy+o)+'" x2="'+W+'" y2="'+(cy+o)+'" stroke="var(--ring)" stroke-width="1" opacity=".6"/>'}
+ const pos=a=>({x:cx+(a.lng-C.lng)*mpd*k,y:cy-(a.lat-C.lat)*69*k});
+ const inView=rows.filter(r=>{const q=pos(r.a);return q.x>14&&q.x<W-14&&q.y>34&&q.y<H-14});
+ const out=rows.length-inView.length;
+ const lab=inView.length<=6;
+ inView.slice().sort((p,q)=>pos(p.a).y-pos(q.a).y).forEach(r=>{const a=r.a,q=pos(a),c=CATS[a.cat][1],on=S.sel===a.id,sc=on?1.35:1;
+  s+='<g data-id="'+a.id+'" style="cursor:pointer" opacity="'+(r.fit?1:.4)+'" tabindex="0" role="button" aria-label="'+esc(a.name)+'"><circle cx="'+q.x+'" cy="'+(q.y-14)+'" r="22" fill="transparent"/>'+
+  '<path transform="translate('+q.x+','+q.y+') scale('+sc+')" d="M0 0 L-7 -11 A9 9 0 1 1 7 -11 Z" fill="'+c+'" stroke="#fff" stroke-width="2"/><text x="'+q.x+'" y="'+(q.y-16*sc+4*sc)+'" text-anchor="middle" font-size="'+(11*sc)+'">'+CATS[a.cat][3]+'</text>'+
+  ((on||lab)?'<text x="'+(q.x>W-150?q.x-14:q.x+14)+'" y="'+(q.y-12)+'" text-anchor="'+(q.x>W-150?'end':'start')+'" font-size="13" font-weight="800" fill="var(--ink)" stroke="var(--mapbg)" stroke-width="4" paint-order="stroke">'+esc(a.name)+'</text>':'')+'</g>'});
+ s+='<circle cx="'+cx+'" cy="'+cy+'" r="9" fill="var(--ember)" stroke="#fff" stroke-width="3"/><text x="'+(cx+14)+'" y="'+(cy+5)+'" font-size="13" font-weight="800" fill="var(--ink)" stroke="var(--mapbg)" stroke-width="4" paint-order="stroke">BYU-Idaho</text>';
+ s+='<g transform="translate(20,'+(H-24)+')"><line x2="'+(step*k)+'" stroke="var(--ink)" stroke-width="3"/><text y="-8" font-size="12" font-weight="600" fill="var(--ink)">'+step+' mi</text></g>';
+ s+='<g transform="translate('+(W-28)+',44)"><path d="M0 -14 L7 6 L0 2 L-7 6Z" fill="var(--ink)"/><text y="22" text-anchor="middle" font-size="12" font-weight="800" fill="var(--ink)">N</text></g>';
+ if(out)s+='<text x="'+cx+'" y="'+(H-10)+'" text-anchor="middle" font-size="12" fill="var(--muted)">'+out+' more outside this view</text>';
+ document.getElementById('map').innerHTML=s;
+ const sh=document.getElementById('sheet'),r=rows.find(x=>x.a.id===S.sel);
+ sh.innerHTML=r?card(r)+'<button class="go2" id="tolist">Show in list</button>':'<span style="color:var(--muted)">Tap a pin to see details.</span>'}
+function summary(rows){const ap=document.getElementById('apply');if(ap)ap.textContent='Show '+rows.filter(r=>r.fit).length+' that fit';document.getElementById('sum').innerHTML=rows.filter(r=>r.fit).length+' of '+rows.length+' fit your '+S.budget+' hr <span>by '+MODES[S.mode].toLowerCase()+' on '+DAYS[S.day]+'</span>'}
+function pick(id){S.sel=id;render()}
+function setTab(t){S.tab=t;['explore','map','filters'].forEach(k=>{document.getElementById('v-'+k).hidden=k!==t});
+ document.querySelectorAll('.nav button').forEach(b=>b.setAttribute('aria-selected',b.dataset.tab===t));document.getElementById('v-'+t).scrollTop=0}
+function chips(id,items,key,all){const el=document.getElementById(id);
+ el.innerHTML=items.map(([k,l])=>'<button class="chip" data-k="'+k+'" aria-pressed="'+(S[key]===(k==='all'?null:k))+'">'+l+'</button>').join('');
+ el.onclick=e=>{const b=e.target.closest('button');if(!b)return;S[key]=b.dataset.k==='all'?null:b.dataset.k;chips(id,items,key);render()}}
+chips('modes',[['walk','🚶 Walk'],['bike','🚲 Bike'],['drive','🚗 Drive']],'mode');
+chips('cats',[['all','Everything'],...Object.entries(CATS).map(([k,v])=>[k,v[3]+' '+v[0]])],'cat');
+document.getElementById('day').innerHTML=DAYS.map((d,i)=>'<option value="'+i+'"'+(i===S.day?' selected':'')+'>'+(i===NOW.day?'Today, ':'')+d+'</option>').join('');
+document.getElementById('day').onchange=e=>{S.day=+e.target.value;render()};
+document.getElementById('budget').oninput=e=>{S.budget=+e.target.value;render()};
+document.getElementById('free').onclick=e=>{S.free=!S.free;e.currentTarget.setAttribute('aria-pressed',S.free);render()};
+document.getElementById('list').onclick=e=>{if(e.target.closest('a'))return;const it=e.target.closest('.item');if(it){S.sel=+it.dataset.id;render()}};
+document.getElementById('sheet').onclick=e=>{if(e.target.id==='tolist'){setTab('explore');const el=document.getElementById('i'+S.sel);if(el)el.scrollIntoView({block:'center'})}};
+document.querySelector('.nav').onclick=e=>{const b=e.target.closest('button');if(b)setTab(b.dataset.tab)};
+chips('zoom',Object.entries(ZOOMS).map(([k,v])=>[k,v[0]]),'zoom');
+document.getElementById('map').onclick=e=>{const g=e.target.closest('g[data-id]');if(g)pick(+g.dataset.id)};
+document.getElementById('map').onkeydown=e=>{if(e.key==='Enter'||e.key===' '){const g=e.target.closest('g[data-id]');if(g){e.preventDefault();pick(+g.dataset.id)}}};
+const CATITEMS=()=>[['all','Everything'],...Object.entries(CATS).map(([k,v])=>[k,v[3]+' '+v[0]])];
+document.getElementById('apply').onclick=()=>setTab('explore');
+document.getElementById('reset').onclick=()=>{Object.assign(S,{mode:'drive',cat:null,free:false,day:NOW.day,budget:3});
+ document.getElementById('budget').value=3;document.getElementById('day').value=NOW.day;document.getElementById('free').setAttribute('aria-pressed','false');
+ chips('modes',[['walk','🚶 Walk'],['bike','🚲 Bike'],['drive','🚗 Drive']],'mode');chips('cats',CATITEMS(),'cat');render()};
+render();
+</script>
+</body>
+</html>
+
+</body></html>
