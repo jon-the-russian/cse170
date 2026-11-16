@@ -47,6 +47,7 @@ input[type=range]{flex:1;min-width:120px;height:36px;accent-color:var(--ember)}
 .t{display:inline-flex;align-items:baseline;gap:8px;background:var(--c);color:#fff;border-radius:999px;padding:6px 14px;font-weight:800;font-size:1.05rem;margin-bottom:10px}
 .t small{font-size:.8rem;font-weight:600;color:#fff;opacity:.95;margin:0}
 .item h2{margin:0 0 4px;font-size:1.25rem;font-weight:800;display:flex;align-items:center;gap:10px}
+.item-photo{display:block;width:100%;height:170px;object-fit:cover;border-radius:16px;margin:0 0 12px;border:2px solid #fff;box-shadow:0 4px 12px rgba(17,24,39,.14)}
 .em{flex:none;width:38px;height:38px;border-radius:12px;display:grid;place-items:center;font-size:1.3rem}
 .item p{margin:0 0 10px;color:var(--muted);font-size:.95rem}
 .meta{display:flex;flex-wrap:wrap;gap:4px 12px;font-size:.88rem;margin-bottom:4px}
@@ -377,6 +378,7 @@ const C={lat:43.8183,lng:-111.7835};
 const CATS={outdoors:['Outdoors','#374151','#E5E7EB','⛰️'],water:['Water','#6B7280','#F3F4F6','💦'],winter:['Winter','#111827','#E5E7EB','⛷️'],town:['Town and campus','#4B5563','#E5E7EB','🎓'],trip:['Day trips','#9CA3AF','#F3F4F6','🦬']};
 const MODES={walk:'Walk',bike:'Bike',drive:'Drive'};
 const DAYS=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+const PLACE_IMAGES=['byui-center.jpg','porter-park.png','teton-museum.jpg','temple.jpg','rexburg-rapids.jpeg','beaver-dick.jpg','menan-buttes.jpeg','teton-dam.jpg','sand-dunes.jpg','ririe-reservoir.jpg','heise-hot-springs.jpg','kelly-canyon.jpg','upper-mesa-falls.jpg','grand-targhee.jpg','yellowstone-west-entrance.jpg'];
 // name, cat, lat, lng, cost, hours to spend, days (null=all), open hours [from,to] (null=check), season [startMonth,endMonth] (null=all), note
 const A=[
 ['Devotional at the BYU-I Center','town',43.8183,-111.7835,'Free',1,[2],[11.5,12.5],null,'Weekly campus devotional. Confirm the schedule at byui.edu.'],
@@ -394,7 +396,7 @@ const A=[
 ['Upper Mesa Falls','outdoors',44.1750,-111.2630,'$',3,null,[8,19],[5,10],'A 110-foot waterfall on the Henrys Fork with boardwalk overlooks. The road closes with snow.'],
 ['Grand Targhee','winter',43.7880,-110.9590,'$$',8,null,null,null,'Ski and snowboard resort on the Wyoming side of the Tetons, with summer hiking.'],
 ['Yellowstone West Entrance','trip',44.6590,-111.0970,'$$',10,null,[6,21],null,'A full-day trip. Entrance fee is charged per vehicle.']
-].map((a,i)=>{const o={id:i,name:a[0],cat:a[1],lat:a[2],lng:a[3],cost:a[4],dur:a[5],days:a[6],hrs:a[7],season:a[8],note:a[9]};
+].map((a,i)=>{const o={id:i,name:a[0],cat:a[1],lat:a[2],lng:a[3],cost:a[4],dur:a[5],days:a[6],hrs:a[7],season:a[8],note:a[9],image:PLACE_IMAGES[i]};
  const R=Math.PI/180,dLa=(o.lat-C.lat)*R,dLn=(o.lng-C.lng)*R;
  const h=Math.sin(dLa/2)**2+Math.cos(C.lat*R)*Math.cos(o.lat*R)*Math.sin(dLn/2)**2;
  o.mi=3958.8*2*Math.asin(Math.sqrt(h));
@@ -434,7 +436,7 @@ function card(r){const a=r.a,c=CATS[a.cat][1];
   const url='https://www.google.com/maps/dir/?api=1&origin='+C.lat+','+C.lng+'&destination='+a.lat+','+a.lng+'&travelmode='+(S.mode==='bike'?'bicycling':S.mode==='walk'?'walking':'driving');
   return '<article class="item'+(r.fit?'':' off')+(S.sel===a.id?' sel':'')+'" style="--c:'+c+'" data-id="'+a.id+'" id="i'+a.id+'">'+
   '<div class="t">'+fmt(r.m)+'<small>'+MODES[S.mode].toLowerCase()+', '+(a.mi<10?a.mi.toFixed(1):Math.round(a.mi))+' mi</small></div>'+
-  '<div><h2><span class="em" style="background:'+CATS[a.cat][2]+'">'+CATS[a.cat][3]+'</span>'+esc(a.name)+'</h2><p>'+esc(a.note)+'</p><div class="meta"><span><b>'+CATS[a.cat][0]+'</b></span><span>'+a.cost+'</span><span>Plan on '+a.dur+' hr there</span>'+
+  '<div><img class="item-photo" src="images/places/'+a.image+'" alt="Photo of '+esc(a.name)+'" loading="lazy"><h2><span class="em" style="background:'+CATS[a.cat][2]+'">'+CATS[a.cat][3]+'</span>'+esc(a.name)+'</h2><p>'+esc(a.note)+'</p><div class="meta"><span><b>'+CATS[a.cat][0]+'</b></span><span>'+a.cost+'</span><span>Plan on '+a.dur+' hr there</span>'+
   '<span'+(r.st.now?' class="now"':'')+'>'+(r.st.now?'Open now, ':'')+r.st.t+'</span></div>'+
   (why?'<div class="meta"><span>'+esc(why)+'</span></div>':'')+
   '<a class="go" href="'+url+'" target="_blank" rel="noopener">Get directions</a></div></article>'}
