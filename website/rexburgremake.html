@@ -117,6 +117,16 @@ select{min-width:0}
 .mission-card{background:#FFF1D6;border:2px solid var(--ember)}
 .mission-card h2{color:var(--ember)}
 .mission-card p{margin:7px 0 0;font-size:.96rem}
+.food-recommendations{margin:14px 12px 0;padding:18px;background:#F4F5F7;border-radius:24px;box-shadow:var(--shadow)}
+.food-recommendations h2{margin:0 0 6px;font-size:1.3rem;font-weight:800}
+.food-intro{margin:0 0 14px;color:var(--muted);font-size:.92rem}
+.food-list{display:grid;gap:10px;margin:0;padding:0;list-style:none}
+.food-card{padding:13px;background:#fff;border:2px solid #D1D5DB;border-radius:18px}
+.food-card h3{margin:0 0 4px;font-size:1.05rem}
+.food-card p{margin:4px 0;color:var(--muted);font-size:.88rem}
+.food-meta{display:flex;flex-wrap:wrap;gap:5px 12px;margin-top:8px;font-size:.84rem}
+.food-meta a{font-weight:700;color:#111827}
+.food-price{font-weight:800;color:#374151}
 .plan{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:12px;border-radius:14px;background:#fff;border:2px solid var(--line)}
 .plan b{display:block}
 .plan small{color:var(--muted)}
@@ -200,6 +210,37 @@ button.go{border:0;cursor:pointer}
     </section>
     <section class="welcome" aria-label="Welcome">
       <p>Welcome to Rexburg! Of all the college towns in the US, you chose the best one. Some of the best activities to do are all around. Whether you have moved here for work, school, or to raise a family, this place is perfect. We have assembled some of the greatest attractions that are near you here in Rexburg, all depending on the amount of time you have.</p>
+    </section>
+    <section class="food-recommendations" aria-labelledby="food-title">
+      <h2 id="food-title">Top 5 budget-friendly food spots</h2>
+      <p class="food-intro">Good local choices for students and visitors. Prices and hours can change, so contact the restaurant before you go.</p>
+      <ol class="food-list">
+        <li class="food-card">
+          <h3>1. Rusty Taco</h3>
+          <p>Street tacos, breakfast, and bowls with several affordable options near campus.</p>
+          <div class="food-meta"><span class="food-price">$</span><span>1055 S 12th W</span><a href="tel:+12086093492">(208) 609-3492</a><a href="https://www.google.com/maps/search/?api=1&amp;query=Rusty+Taco+1055+South+12th+West+Rexburg+ID" target="_blank" rel="noopener">Directions</a></div>
+        </li>
+        <li class="food-card">
+          <h3>2. Costa Vida</h3>
+          <p>Fresh Mexican food with tacos, bowls, nachos, and other quick meal options.</p>
+          <div class="food-meta"><span class="food-price">$</span><span>485 N 2nd E</span><a href="tel:+12083567733">(208) 356-7733</a><a href="https://www.google.com/maps/search/?api=1&amp;query=Costa+Vida+485+North+2nd+East+Rexburg+ID" target="_blank" rel="noopener">Directions</a></div>
+        </li>
+        <li class="food-card">
+          <h3>3. Righteous Slice</h3>
+          <p>Artisan pizza by the slice, making it easy to choose a filling meal on a budget.</p>
+          <div class="food-meta"><span class="food-price">$</span><span>175 W 2nd S, Suite 100</span><a href="tel:+12088204597">(208) 820-4597</a><a href="https://www.google.com/maps/search/?api=1&amp;query=Righteous+Slice+175+West+2nd+South+Rexburg+ID" target="_blank" rel="noopener">Directions</a></div>
+        </li>
+        <li class="food-card">
+          <h3>4. Blister's BBQ</h3>
+          <p>Hearty barbecue sandwiches and sides from a local restaurant with affordable choices.</p>
+          <div class="food-meta"><span class="food-price">$</span><span>26 E Main St</span><a href="tel:+12082439291">(208) 243-9291</a><a href="https://www.google.com/maps/search/?api=1&amp;query=Blisters+BBQ+26+East+Main+Street+Rexburg+ID" target="_blank" rel="noopener">Directions</a></div>
+        </li>
+        <li class="food-card">
+          <h3>5. Big Jud's</h3>
+          <p>A Rexburg-area burger favorite with generous portions, fries, and classic diner food.</p>
+          <div class="food-meta"><span class="food-price">$–$$</span><span>411 W 7800 S</span><a href="tel:+12083592833">(208) 359-2833</a><a href="https://www.google.com/maps/search/?api=1&amp;query=Big+Juds+411+West+7800+South+Rexburg+ID" target="_blank" rel="noopener">Directions</a></div>
+        </li>
+      </ol>
     </section>
     <p class="sum" id="sum"></p>
     <main id="list"></main>
