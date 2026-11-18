@@ -1,0 +1,775 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Rexburg's Greatest: activities near BYU-Idaho</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="">
+<style>
+:root{--bg:#FFF8EC;--panel:#FFFFFF;--ink:#1B2A41;--muted:#66758A;--line:#F0E4CF;--brand:#2D7FF9;--ember:#FF5A4F;--ring:#BFE3CE;--mapbg:#E3F6EA;--shadow:0 2px 0 rgba(27,42,65,.04),0 8px 22px rgba(27,42,65,.10);color-scheme:light;box-sizing:border-box}
+*,*::before,*::after{box-sizing:border-box}
+html,body{height:100%}
+body{margin:0;background:#FFE9B8;color:var(--ink);font-family:"Bricolage Grotesque",system-ui,-apple-system,"Segoe UI",sans-serif;line-height:1.4;-webkit-text-size-adjust:100%;-webkit-tap-highlight-color:transparent}
+.view-switcher{position:fixed;top:14px;right:14px;z-index:20}
+.view-switcher button{border:2px solid #FFFFFF;border-radius:999px;background:#111827;color:#FFFFFF;padding:10px 15px;font-weight:800;box-shadow:0 5px 16px rgba(17,24,39,.25);cursor:pointer}
+.view-switcher button:hover{background:#374151}
+body.browser-mode{display:block;overflow:auto;background:#E5E7EB;padding:70px 24px 24px}
+body.browser-mode .app{max-width:1400px;width:100%;height:calc(100dvh - 94px);min-height:720px;border:0;border-radius:18px;box-shadow:0 12px 36px rgba(17,24,39,.22);display:grid;grid-template-rows:auto auto minmax(0,1fr)}
+body.browser-mode .bar{grid-row:1;border-radius:0;padding-left:32px}
+body.browser-mode .nav{grid-row:2;display:flex;justify-content:center;gap:12px;border-top:0;border-bottom:2px solid var(--line);padding:10px 18px}
+body.browser-mode .nav button{min-width:130px}
+body.browser-mode .view{grid-row:3;min-height:0;overflow-y:auto}
+body.browser-mode #v-explore{padding:0 24px 24px}
+body.browser-mode .fbar,body.browser-mode .welcome,body.browser-mode .food-recommendations,body.browser-mode .sum,body.browser-mode .foot{max-width:1320px;margin-left:auto;margin-right:auto}
+body.browser-mode #list{max-width:1320px;margin-left:auto;margin-right:auto;grid-template-columns:repeat(3,minmax(0,1fr))}
+body.browser-mode .item{height:100%}
+body.browser-mode .item-photo{height:210px}
+a{color:var(--brand)}
+button,select,input,textarea{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--brand);outline-offset:2px}
+.app{max-width:480px;height:100vh;height:100dvh;margin:0 auto;background:var(--bg);display:flex;flex-direction:column;overflow:hidden}
+@media (min-width:600px){body{display:grid;place-items:center}.app{height:min(880px,calc(100dvh - 32px));border-radius:36px;box-shadow:0 20px 50px rgba(255,140,60,.35);border:6px solid #fff;width:100%}}
+.bar{flex:none;padding:calc(env(safe-area-inset-top,0px) + 16px) 20px 18px;background:linear-gradient(135deg,#2D7FF9 0%,#12B5A6 70%,#7BDC8A 100%);color:#fff;border-radius:0 0 28px 28px}
+.bar h1{margin:0;font-size:1.7rem;font-weight:800;letter-spacing:-.02em;line-height:1.05}
+.bar span{display:block;margin-top:4px;font-size:.95rem;opacity:.95}
+.view{flex:1;min-height:0;overflow-y:auto;-webkit-overflow-scrolling:touch;padding-bottom:12px}
+#v-map:not([hidden]){display:flex;flex-direction:column;overflow:hidden;padding-bottom:0}
+.welcome{margin:14px 12px 0;padding:18px;background:var(--panel);border-radius:24px;box-shadow:var(--shadow)}
+.welcome p{margin:0;font-size:.98rem}
+.fav{margin:14px 12px 0;padding:18px;background:#FFF1D6;border-radius:24px;box-shadow:var(--shadow);border:3px solid var(--ember)}
+.fav h2{margin:0 0 8px;font-size:1.2rem;font-weight:800;color:var(--ember)}
+.fav p{margin:0;font-size:.98rem}
+.fav img{display:block;width:100%;height:auto;border-radius:16px;margin:0 0 12px;border:2px solid #fff;box-shadow:0 4px 12px rgba(27,42,65,.18)}
+.sum{margin:14px 20px 4px;font-weight:800;font-size:1.05rem}
+.sum span{color:var(--muted);font-weight:400}
+.controls{display:grid;gap:18px;margin:14px 12px;padding:18px;background:var(--panel);border-radius:24px;box-shadow:var(--shadow)}
+.lab{font-weight:800;font-size:.95rem;margin-bottom:8px;display:block}
+.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.scroll{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;margin:0 -18px;padding:2px 18px}
+.scroll::-webkit-scrollbar{display:none}
+.chip{flex:none;border:2px solid var(--line);background:#fff;border-radius:999px;padding:9px 16px;min-height:44px;cursor:pointer;font-size:.95rem;font-weight:600}
+.chip[aria-pressed="true"]{background:var(--brand);color:#fff;border-color:var(--brand)}
+select{border:2px solid var(--line);background:#fff;border-radius:999px;padding:9px 14px;min-height:44px;flex:1;font-weight:600}
+input[type=range]{flex:1;min-width:120px;height:36px;accent-color:var(--ember)}
+.hrs{font-weight:800;font-size:1.6rem;min-width:70px;text-align:right;color:var(--ember)}
+#list{padding:8px 12px 12px;display:grid;gap:14px}
+.item{display:block;padding:16px;background:var(--panel);border-radius:24px;box-shadow:var(--shadow);cursor:pointer;border:3px solid transparent}
+.item.sel{border-color:var(--c)}
+.item.off{opacity:.55}
+.t{display:inline-flex;align-items:baseline;gap:8px;background:var(--c);color:#fff;border-radius:999px;padding:6px 14px;font-weight:800;font-size:1.05rem;margin-bottom:10px}
+.t small{font-size:.8rem;font-weight:600;color:#fff;opacity:.95;margin:0}
+.site-chip{display:inline-block;color:#fff;text-decoration:none;background:rgba(255,255,255,.2);border:1px solid rgba(255,255,255,.7);border-radius:999px;padding:3px 8px;font-size:.75rem;font-weight:800}
+.site-chip:hover,.site-chip:focus-visible{background:#fff;color:var(--ink)}
+.item h2{margin:0 0 4px;font-size:1.25rem;font-weight:800;display:flex;align-items:center;gap:10px}
+.place-link{color:inherit;text-decoration:none}
+.place-link:hover,.place-link:focus-visible{text-decoration:underline}
+.em{flex:none;width:38px;height:38px;border-radius:12px;display:grid;place-items:center;font-size:1.3rem}
+.item p{margin:0 0 10px;color:var(--muted);font-size:.95rem}
+.meta{display:flex;flex-wrap:wrap;gap:4px 12px;font-size:.88rem;margin-bottom:4px}
+.meta b{font-weight:700}
+.now{color:#0B9B5B;font-weight:800}
+.go{display:block;margin-top:12px;text-align:center;text-decoration:none;font-weight:800;background:var(--brand);color:#fff;border-radius:16px;padding:14px}
+.empty{padding:28px 16px;color:var(--muted);text-align:center}
+.foot{margin:0;padding:4px 24px 16px;color:var(--muted);font-size:.8rem;text-align:center}
+.zoom{padding:12px 12px 0}
+.zoom .scroll{margin:0 -12px;padding:2px 12px}
+.mapbox{flex:1;min-height:200px;margin:12px;background:var(--mapbg);border-radius:24px;box-shadow:var(--shadow);overflow:hidden}
+.mapbox #real-map{width:100%;height:100%;min-height:420px}
+.mapbox #real-map .leaflet-container{font:inherit;background:#E8EEF0}
+.mapbox #real-map .leaflet-tile-pane{filter:saturate(.78) brightness(1.04)}
+.map-marker-wrap{background:transparent;border:0}
+.map-pin{width:38px;height:38px;display:grid;place-items:center;border:3px solid #fff;border-radius:50% 50% 50% 8px;transform:rotate(-45deg);box-shadow:0 5px 12px rgba(17,24,39,.28);color:#fff;font-size:1rem}
+.map-pin span{transform:rotate(45deg);line-height:1}
+.map-pin-campus{background:#374151;border-radius:50%}
+.map-popup{width:210px;overflow:hidden;color:#111827}
+.map-popup img{display:block;width:100%;height:92px;object-fit:cover;border-radius:12px;margin-bottom:9px}
+.map-popup strong{display:block;font-size:1rem;line-height:1.2;margin-bottom:7px}
+.map-popup-actions{display:flex;gap:6px;flex-wrap:wrap}
+.map-popup-actions a{display:inline-block;padding:7px 9px;border-radius:999px;background:#374151;color:#fff;text-decoration:none;font-size:.78rem;font-weight:800}
+.map-popup-actions a:hover,.map-popup-actions a:focus-visible{background:#C4662D}
+.map-legend{position:absolute;z-index:500;right:14px;top:14px;width:178px;padding:12px 14px;border:1px solid rgba(255,255,255,.8);border-radius:18px;background:rgba(255,255,255,.92);box-shadow:0 8px 22px rgba(17,24,39,.18);color:#111827}
+.map-legend h3{margin:0 0 8px;font-size:.82rem;text-transform:uppercase;letter-spacing:.08em;color:#5B6472}
+.map-legend-list{display:grid;gap:7px}
+.map-legend-item{display:flex;align-items:center;gap:8px;font-size:.82rem;font-weight:700}
+.map-legend-dot{width:14px;height:14px;border-radius:50%;flex:none;box-shadow:0 0 0 2px #fff,0 1px 4px rgba(17,24,39,.25)}
+.mapbox #map{display:none}
+#map{width:100%;height:100%;display:block;touch-action:none;cursor:grab;user-select:none;-webkit-user-select:none}
+#map:active{cursor:grabbing}
+.mapbox{position:relative}
+.zbtns{position:absolute;right:10px;bottom:52px;display:grid;gap:8px}
+.zbtns button{width:44px;height:44px;border:0;border-radius:14px;background:#F4F5F7;color:#111827;box-shadow:var(--shadow);font-size:1.5rem;font-weight:800;line-height:1;cursor:pointer}
+.recenter{position:absolute;left:10px;top:10px;border:0;border-radius:999px;background:#F4F5F7;color:#111827;box-shadow:var(--shadow);min-height:40px;padding:0 16px;font-weight:800;cursor:pointer}
+.sheet{flex:none;max-height:42%;overflow:auto;margin:0 12px 12px;padding:16px;background:var(--panel);border-radius:24px;box-shadow:var(--shadow)}
+.sheet .item{padding:0;box-shadow:none;cursor:default;border:0}
+.sheet .go2{display:block;width:100%;margin-top:8px;border:0;background:#FFF1D6;color:var(--ink);font-weight:700;border-radius:14px;padding:13px;cursor:pointer}
+.nav{flex:none;display:grid;grid-template-columns:repeat(5,1fr);gap:2px;background:#fff;border-top:2px solid var(--line);padding:8px 6px calc(env(safe-area-inset-bottom,0px) + 8px)}
+.nav button{border:0;background:none;display:grid;justify-items:center;align-content:start;gap:2px;padding:8px 2px;border-radius:14px;cursor:pointer;color:var(--muted);font-size:.68rem;font-weight:700;line-height:1.1;text-align:center}
+.nav button svg{width:24px;height:24px}
+.nav button[aria-selected="true"]{color:var(--brand);background:#E6F0FF}
+[hidden]{display:none!important}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
+
+.controls{gap:20px}
+#modes,#cats,#zoom{display:grid;gap:8px;overflow:visible;margin:0;padding:0}
+#modes{grid-template-columns:repeat(3,1fr)}
+#zoom{grid-template-columns:repeat(4,1fr)}
+#cats{grid-template-columns:repeat(2,1fr)}
+#modes .chip,#cats .chip,#zoom .chip{width:100%;padding:10px 8px;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.zoom{padding:12px 12px 0}
+.ticks{display:flex;justify-content:space-between;font-size:.78rem;color:var(--muted);margin-top:-4px}
+.dayrow{display:grid;grid-template-columns:1fr auto;gap:8px}
+select{min-width:0}
+.ftoggle{display:flex;justify-content:space-between;align-items:center;width:calc(100% - 24px);margin:14px 12px 0;padding:14px 18px;min-height:52px;border:0;border-radius:24px;background:#F4F5F7;color:#111827;box-shadow:var(--shadow);font-weight:800;font-size:1.05rem;cursor:pointer}
+.ftoggle svg{transition:transform .2s}
+.ftoggle[aria-expanded="true"] svg{transform:rotate(180deg)}
+#fpanel{margin-top:8px}
+#reset{min-height:46px;border-radius:16px;border:2px solid var(--line);background:#fff;font-weight:800;cursor:pointer}
+
+/* Settings, About Us, Schedule, Get Together */
+.settings-wrap{padding:14px 12px 18px;display:grid;gap:14px}
+.settings-card,.about-intro,.mission-card{background:var(--panel);border-radius:24px;padding:18px;box-shadow:var(--shadow)}
+.settings-wrap h2{margin:0 0 6px;font-size:1.3rem;font-weight:800}
+.settings-wrap h3{margin:0 0 5px;font-size:1.05rem;font-weight:800}
+.section-sub{margin:0 0 14px;color:var(--muted);font-size:.92rem}
+.account-switch{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:12px 0}
+.account-switch button,.account-form button{border:0;border-radius:14px;min-height:44px;padding:10px 14px;font-weight:800;cursor:pointer}
+.account-switch button{background:#EEF3FA;color:var(--muted)}
+.account-switch button[aria-pressed="true"]{background:var(--brand);color:#fff}
+.account-form{display:grid;gap:10px}
+.account-form label{display:grid;gap:5px;font-size:.9rem;font-weight:700}
+.account-form input,.account-form select,.account-form textarea{width:100%;min-height:46px;border:2px solid var(--line);border-radius:13px;padding:10px 12px;background:#fff}
+.account-form textarea{min-height:80px;resize:vertical}
+.account-form button{background:var(--ember);color:#fff;margin-top:2px}
+.account-note{margin:12px 0 0;padding:11px 12px;border-radius:13px;background:#FFF1D6;color:#75511B;font-size:.85rem}
+.account-status{min-height:1.2em;margin:8px 0 0;color:var(--muted);font-size:.85rem}
+.about-heading{margin:2px 4px 0;font-size:1.5rem;font-weight:800}
+.team-grid{display:grid;gap:12px}
+.person-card{display:grid;grid-template-columns:104px 1fr;gap:13px;align-items:start;padding:13px;background:var(--panel);border-radius:20px;box-shadow:var(--shadow)}
+.person-card img,.person-placeholder{width:104px;height:124px;object-fit:cover;border-radius:14px;background:#E6F0FF}
+.person-placeholder{display:grid;place-items:center;color:var(--brand);font-size:1.8rem;font-weight:800;border:2px dashed #B8D2F8}
+.person-card h3{margin:2px 0 5px;font-size:1.03rem}
+.person-card p{margin:0;color:var(--muted);font-size:.88rem;line-height:1.45}
+.mission-card{background:#FFF1D6;border:2px solid var(--ember)}
+.mission-card h2{color:var(--ember)}
+.mission-card p{margin:7px 0 0;font-size:.96rem}
+.food-recommendations{margin:14px 12px 0;padding:18px;background:#F4F5F7;border-radius:24px;box-shadow:var(--shadow)}
+.food-recommendations h2{margin:0 0 6px;font-size:1.3rem;font-weight:800}
+.food-intro{margin:0 0 14px;color:var(--muted);font-size:.92rem}
+.food-list{display:grid;gap:10px;margin:0;padding:0;list-style:none}
+.food-card{padding:13px;background:#fff;border:2px solid #D1D5DB;border-radius:18px}
+.food-card h3{display:flex;align-items:center;gap:8px;margin:0 0 4px;font-size:1.05rem}
+.food-card h3 a{color:inherit;text-decoration:none}
+.food-card h3 a:hover,.food-card h3 a:focus-visible{text-decoration:underline}
+.food-card p{margin:4px 0;color:var(--muted);font-size:.88rem}
+.food-meta{display:flex;flex-wrap:wrap;gap:5px 12px;margin-top:8px;font-size:.84rem}
+.food-meta a{font-weight:700;color:#111827}
+.food-website{display:inline-block;padding:2px 8px;border-radius:999px;background:#E5E7EB;color:#111827!important;text-decoration:none}
+.food-website:hover,.food-website:focus-visible{background:#D1D5DB;text-decoration:underline}
+.food-directions{display:inline-grid;width:30px;height:30px;place-items:center;border-radius:50%;background:#374151;color:#fff!important;text-decoration:none;font-size:1.05rem;line-height:1;flex:none}
+.food-directions:hover,.food-directions:focus-visible{background:#C4662D}
+.food-price{font-weight:800;color:#374151}
+.plan{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:12px;border-radius:14px;background:#fff;border:2px solid var(--line)}
+.plan b{display:block}
+.plan small{color:var(--muted)}
+.plan button{flex:none;border:0;background:#E5E7EB;border-radius:12px;min-height:40px;padding:0 14px;font-weight:700;cursor:pointer}
+.plans{display:grid;gap:8px;margin-top:14px}
+.invite{margin-top:12px;padding:12px;border-radius:14px;background:#fff;border:2px dashed var(--line);white-space:pre-wrap;font-size:.92rem}
+@media(max-width:360px){.person-card{grid-template-columns:82px 1fr;gap:10px}.person-card img,.person-placeholder{width:82px;height:106px}}
+
+/* Blue-gradient theme: light blue on the left, deep blue on the right; neutral UI. */
+:root{
+  --bg:transparent;
+  --panel:#F4F5F7;
+  --ink:#111827;
+  --muted:#5B6472;
+  --line:#D1D5DB;
+  --brand:#111827;
+  --ember:#4B5563;
+  --ring:#9CA3AF;
+  --mapbg:#E5E7EB;
+  --shadow:0 3px 0 rgba(17,24,39,.04),0 10px 24px rgba(17,24,39,.16);
+  color-scheme:light;
+}
+body{background:linear-gradient(to right,#A9D8FF 0%,#5D91C7 48%,#082B59 100%);color:var(--ink)}
+.app{background:linear-gradient(to right,#A9D8FF 0%,#5D91C7 48%,#082B59 100%)}
+@media (min-width:600px){.app{border-color:#F4F5F7;box-shadow:0 20px 50px rgba(0,0,0,.28)}}
+.bar{background:linear-gradient(135deg,#111827 0%,#374151 100%);color:#FFFFFF}
+.welcome,.controls,.item,.sheet,.settings-card,.about-intro,.person-card,.mission-card{background:#F4F5F7;color:#111827}
+.fav{background:#E5E7EB;border-color:#6B7280}
+.fav h2,.mission-card h2{color:#111827}
+.fav img{border-color:#FFFFFF}
+.chip,select,.account-form input,.account-form select,.account-form textarea{background:#FFFFFF;color:#111827;border-color:#D1D5DB}
+.chip[aria-pressed="true"],.account-switch button[aria-pressed="true"]{background:#374151;color:#FFFFFF;border-color:#374151}
+input[type=range]{accent-color:#4B5563}
+.hrs{color:#374151}
+.t{color:#FFFFFF}
+.go,.account-form button{background:#374151;color:#FFFFFF}
+.now{color:#374151}
+.mapbox{background:#DDE7CF}
+.sheet .go2{background:#E5E7EB;color:#111827}
+.nav{background:#F4F5F7;border-top-color:#D1D5DB}
+.nav button[aria-selected="true"]{color:#111827;background:#E5E7EB}
+.account-switch button{background:#E5E7EB;color:#4B5563}
+.account-note{background:#E5E7EB;color:#374151}
+.person-placeholder{background:#E5E7EB;color:#374151;border-color:#9CA3AF}
+.mission-card{border:2px solid #9CA3AF}
+.empty{color:#4B5563}
+.fbar{display:flex;gap:8px;margin:14px 12px 0}
+.fbar .ftoggle{width:auto;margin:0;flex:none;gap:10px}
+.searchbox{flex:1;min-width:0;min-height:52px;border:2px solid #D1D5DB;border-radius:24px;padding:0 16px;background:#fff;color:#111827;box-shadow:var(--shadow)}
+.tg{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:12px;border-radius:14px;background:#fff;border:2px solid #D1D5DB;font-weight:700}
+.tg input{width:22px;height:22px;accent-color:#374151}
+.tglist{display:grid;gap:8px}
+.ph{position:relative;height:112px;border-radius:16px;overflow:hidden;margin-bottom:10px;background:#DDE6EE}
+.ph img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
+.ph-empty{position:absolute;inset:0;display:grid;place-content:center;justify-items:center;gap:4px;border:2px dashed #9CA3AF;border-radius:16px;background:#E5E7EB;color:#5B6472;font-weight:700;font-size:.85rem}
+.ph-empty span{font-size:1.5rem}
+.sheet .ph{height:84px}
+.sub{display:grid;gap:14px}
+.menu-item{display:flex;justify-content:space-between;align-items:center;width:100%;min-height:60px;padding:14px 18px;border:0;border-radius:20px;background:#F4F5F7;color:#111827;box-shadow:var(--shadow);font-weight:800;font-size:1.05rem;cursor:pointer;text-align:left}
+.menu-item span:last-child{font-size:1.5rem;color:#5B6472}
+.back{justify-self:start;border:0;border-radius:999px;background:#F4F5F7;color:#111827;box-shadow:var(--shadow);min-height:44px;padding:0 18px;font-weight:800;cursor:pointer}
+.btns{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}
+.btns .go{margin-top:0;display:flex;align-items:center;justify-content:center;min-height:48px;padding:10px 8px;font-size:.92rem;line-height:1.15}
+button.go{border:0;cursor:pointer}
+.btns .go.sched{background:#E5E7EB;color:#111827;border:2px solid #374151}
+:focus-visible{outline-color:#111827}
+</style>
+</head>
+<body>
+<div class="view-switcher"><button type="button" id="view-toggle" aria-pressed="false">Switch to browser view</button></div>
+<div class="app">
+  <header class="bar"><h1>Rexburg's Greatest</h1><span>Find something fun near BYU-Idaho</span></header>
+
+  <div class="view" id="v-explore">
+    <div class="fbar"><button class="ftoggle" id="ftoggle" aria-expanded="false" aria-controls="fpanel"><span>Filters</span><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></button><input type="search" id="q" class="searchbox" placeholder="Search activities" aria-label="Search activities"></div>
+    <section class="controls" id="fpanel" aria-label="Filters" hidden>
+      <div class="row"><span class="lab" style="margin:0">How much time do you have?</span><input id="budget" type="range" min="1" max="12" value="3" aria-label="Hours available"><span class="hrs" id="bl">3 hr</span></div><div class="ticks" aria-hidden="true"><span>1 hr</span><span>6 hr</span><span>12 hr</span></div>
+      <div><div class="lab">Getting there</div><div id="modes" class="scroll"></div></div>
+      <div><div class="lab">Day</div><div class="dayrow"><select id="day" aria-label="Day"></select><button class="chip" id="free" aria-pressed="false">Free only</button></div></div>
+      <div><div class="lab">Type</div><div id="cats" class="scroll"></div></div>
+      <button id="reset">Reset filters</button>
+    </section>
+    <section class="welcome" aria-label="Welcome">
+      <p>Welcome to Rexburg! Whether you’re here for school, work, or family, there’s always something fun nearby. Explore activities based on how much time you have.</p>
+    </section>
+    <section class="food-recommendations" aria-labelledby="food-title">
+      <h2 id="food-title">Top 5 budget-friendly food spots</h2>
+      <p class="food-intro">Good local choices for students and visitors. Prices and hours can change, so contact the restaurant before you go.</p>
+      <ol class="food-list">
+        <li class="food-card">
+          <h3>1. <a href="https://rustytaco.com/" target="_blank" rel="noopener">Rusty Taco</a><a class="food-directions" href="https://www.google.com/maps/dir/?api=1&amp;origin=43.8183,-111.7835&amp;destination=1055+S+12th+W+Rexburg+ID&amp;travelmode=driving" target="_blank" rel="noopener" aria-label="Driving directions to Rusty Taco" title="Driving directions">↗</a></h3>
+          <p>Street tacos, breakfast, and bowls with several affordable options near campus.</p>
+          <div class="food-meta"><span class="food-price">$</span><span>1055 S 12th W</span><a href="tel:+12086093492">(208) 609-3492</a><a class="food-website" href="https://rustytaco.com/" target="_blank" rel="noopener">Website</a></div>
+        </li>
+        <li class="food-card">
+          <h3>2. <a href="https://www.costavida.com/" target="_blank" rel="noopener">Costa Vida</a><a class="food-directions" href="https://www.google.com/maps/dir/?api=1&amp;origin=43.8183,-111.7835&amp;destination=485+N+2nd+E+Rexburg+ID&amp;travelmode=driving" target="_blank" rel="noopener" aria-label="Driving directions to Costa Vida" title="Driving directions">↗</a></h3>
+          <p>Fresh Mexican food with tacos, bowls, nachos, and other quick meal options.</p>
+          <div class="food-meta"><span class="food-price">$</span><span>485 N 2nd E</span><a href="tel:+12083567733">(208) 356-7733</a><a class="food-website" href="https://www.costavida.com/" target="_blank" rel="noopener">Website</a></div>
+        </li>
+        <li class="food-card">
+          <h3>3. <a href="https://righteousslice.com/" target="_blank" rel="noopener">Righteous Slice</a><a class="food-directions" href="https://www.google.com/maps/dir/?api=1&amp;origin=43.8183,-111.7835&amp;destination=175+W+2nd+S+Suite+100+Rexburg+ID&amp;travelmode=driving" target="_blank" rel="noopener" aria-label="Driving directions to Righteous Slice" title="Driving directions">↗</a></h3>
+          <p>Artisan pizza by the slice, making it easy to choose a filling meal on a budget.</p>
+          <div class="food-meta"><span class="food-price">$</span><span>175 W 2nd S, Suite 100</span><a href="tel:+12088204597">(208) 820-4597</a><a class="food-website" href="https://righteousslice.com/" target="_blank" rel="noopener">Website</a></div>
+        </li>
+        <li class="food-card">
+          <h3>4. <a href="https://blistersbbq.com/" target="_blank" rel="noopener">Blister's BBQ</a><a class="food-directions" href="https://www.google.com/maps/dir/?api=1&amp;origin=43.8183,-111.7835&amp;destination=26+E+Main+St+Rexburg+ID&amp;travelmode=driving" target="_blank" rel="noopener" aria-label="Driving directions to Blister's BBQ" title="Driving directions">↗</a></h3>
+          <p>Hearty barbecue sandwiches and sides from a local restaurant with affordable choices.</p>
+          <div class="food-meta"><span class="food-price">$</span><span>26 E Main St</span><a href="tel:+12082439291">(208) 243-9291</a><a class="food-website" href="https://blistersbbq.com/" target="_blank" rel="noopener">Website</a></div>
+        </li>
+        <li class="food-card">
+          <h3>5. <a href="https://www.bigjuds.com/" target="_blank" rel="noopener">Big Jud's</a><a class="food-directions" href="https://www.google.com/maps/dir/?api=1&amp;origin=43.8183,-111.7835&amp;destination=411+W+7800+S+Rexburg+ID&amp;travelmode=driving" target="_blank" rel="noopener" aria-label="Driving directions to Big Jud's" title="Driving directions">↗</a></h3>
+          <p>A Rexburg-area burger favorite with generous portions, fries, and classic diner food.</p>
+          <div class="food-meta"><span class="food-price">$–$$</span><span>411 W 7800 S</span><a href="tel:+12083592833">(208) 359-2833</a><a class="food-website" href="https://www.bigjuds.com/" target="_blank" rel="noopener">Website</a></div>
+        </li>
+      </ol>
+    </section>
+    <p class="sum" id="sum"></p>
+    <main id="list"></main>
+    <p class="foot">Distances are straight-line from campus, scaled to road time. Hours and seasons are typical, so confirm before you go.</p>
+  </div>
+
+  <div class="view" id="v-map" hidden>
+    <div class="zoom"><div id="zoom" class="scroll"></div></div>
+    <div class="mapbox"><div id="real-map" role="application" aria-label="Interactive map of activities around Rexburg"></div><div class="map-legend" aria-label="Map categories"><h3>Map key</h3><div class="map-legend-list"><div class="map-legend-item"><span class="map-legend-dot" style="background:#2F855A"></span>Outdoors</div><div class="map-legend-item"><span class="map-legend-dot" style="background:#1479A8"></span>Water</div><div class="map-legend-item"><span class="map-legend-dot" style="background:#4C5D9B"></span>Winter</div><div class="map-legend-item"><span class="map-legend-dot" style="background:#C4662D"></span>Town and campus</div><div class="map-legend-item"><span class="map-legend-dot" style="background:#8B5E34"></span>Day trips</div></div></div><svg id="map" viewBox="0 0 520 560" aria-hidden="true"></svg><button type="button" class="recenter" id="recenter" hidden>Recenter</button><div class="zbtns"><button type="button" id="zin" aria-label="Zoom in">+</button><button type="button" id="zout" aria-label="Zoom out">−</button></div></div>
+    <div class="sheet" id="sheet"></div>
+  </div>
+
+  <div class="view" id="v-schedule" hidden>
+    <main class="settings-wrap">
+      <section class="settings-card">
+        <h2>Schedule Activities</h2>
+        <p class="section-sub">Pick an activity and plan when you'll go.</p>
+        <form class="account-form" id="sched-form">
+          <label>Activity<select id="sched-act"></select></label>
+          <label>Day<select id="sched-day"></select></label>
+          <label>Time<input type="time" id="sched-time" value="12:00" required></label>
+          <button type="submit">Add to my schedule</button>
+        </form>
+        <p class="account-status" id="sched-status" aria-live="polite"></p>
+        <div class="plans" id="sched-list"></div>
+        <p class="account-note">Your schedule is kept only while this page is open.</p>
+      </section>
+    </main>
+  </div>
+
+  <div class="view" id="v-together" hidden>
+    <main class="settings-wrap">
+      <section class="settings-card">
+        <h2>Get Together</h2>
+        <p class="section-sub">Plan a group outing and copy an invite to send to friends.</p>
+        <form class="account-form" id="gt-form">
+          <label>Group or event name<input type="text" id="gt-name" placeholder="Friday night crew" required></label>
+          <label>Activity<select id="gt-act"></select></label>
+          <label>Day<select id="gt-day"></select></label>
+          <label>Meet-up time<input type="time" id="gt-time" value="18:00" required></label>
+          <label>Note (optional)<textarea id="gt-note" placeholder="Bring a towel, meet at the Crossroads parking lot..."></textarea></label>
+          <button type="submit">Create invite</button>
+        </form>
+        <div class="invite" id="gt-invite" hidden></div>
+        <button class="chip" id="gt-copy" hidden style="margin-top:10px;width:100%">Copy invite</button>
+        <p class="account-status" id="gt-status" aria-live="polite"></p>
+      </section>
+    </main>
+  </div>
+
+  <div class="view" id="v-settings" hidden>
+    <main class="settings-wrap">
+      <div class="sub" id="set-menu">
+        <h2 class="about-heading">Settings</h2>
+        <button type="button" class="menu-item" data-set="account"><span>👤 Account</span><span aria-hidden="true">›</span></button>
+        <button type="button" class="menu-item" data-set="prefs"><span>🎛️ Preferences</span><span aria-hidden="true">›</span></button>
+        <button type="button" class="menu-item" data-set="notif"><span>🔔 Notifications</span><span aria-hidden="true">›</span></button>
+        <button type="button" class="menu-item" data-set="about"><span>ℹ️ About us</span><span aria-hidden="true">›</span></button>
+        <button type="button" class="menu-item" data-set="help"><span>❓ Help</span><span aria-hidden="true">›</span></button>
+        <button type="button" class="menu-item" data-set="logout"><span>🚪 Log out</span><span aria-hidden="true">›</span></button>
+      </div>
+      <div class="sub" id="set-account" hidden>
+      <button type="button" class="back" data-back>← Settings</button>
+      <section class="settings-card" aria-labelledby="account-title">
+        <h2 id="account-title">Account</h2>
+        <p class="section-sub">Sign up or log in to your account.</p>
+        <div class="account-switch" role="group" aria-label="Choose account action">
+          <button type="button" id="signup-tab" aria-pressed="true">Sign up</button>
+          <button type="button" id="login-tab" aria-pressed="false">Log in</button>
+        </div>
+        <form class="account-form" id="signup-form">
+          <label>Full name<input type="text" name="signup-name" autocomplete="name" placeholder="Enter your name" required></label>
+          <label>Email address<input type="email" name="signup-email" autocomplete="email" placeholder="you@example.com" required></label>
+          <label>Password<input type="password" name="signup-password" autocomplete="new-password" placeholder="Create a password" required></label>
+          <button type="submit">Create account</button>
+        </form>
+        <form class="account-form" id="login-form" hidden>
+          <label>Email address<input type="email" name="login-email" autocomplete="email" placeholder="you@example.com" required></label>
+          <label>Password<input type="password" name="login-password" autocomplete="current-password" placeholder="Enter your password" required></label>
+          <button type="submit">Log in</button>
+        </form>
+        <p class="account-note">Account sign-up and login are display-only placeholders right now. No account information is sent, stored, or saved by this site.</p>
+        <p class="account-status" id="account-status" aria-live="polite"></p>
+      </section>
+
+      </div>
+      <div class="sub" id="set-about" hidden>
+      <button type="button" class="back" data-back>← Settings</button>
+      <h2 class="about-heading">About us</h2>
+      <section class="team-grid" aria-label="Our team">
+        <article class="person-card">
+          <img src="images/jon.jpg" alt="Jonathan McMaster outdoors wearing a black button-up shirt">
+          <div><h3>Jonathan McMaster</h3><p>I come from the beautiful city of Rexburg Idaho, and currently I'm studying Cyber Security at BYU-Idaho. I enjoy swimming at Rexburg Rapids, gaming, and hiking.</p></div>
+        </article>
+        <article class="person-card">
+          <img src="images/grant.jpg" alt="Grant Curtis standing beside the Vince Lombardi Trophy">
+          <div><h3>Grant Curtis</h3><p>I'm a Software Engineering student at BYU-Idaho. I enjoy reading and writing fantasy, drawing, playing video games, and watching sports.</p></div>
+        </article>
+        <article class="person-card">
+          <img src="images/Dallin Self-Portrait.PNG" alt="Dallin Southam">
+          <div><h3>Dallin Southam</h3><p>I'm from Willows, California, and I'm studying Supply Chain Management at BYU–Idaho. In my free time, I enjoy golfing, fishing, playing video games, and spending time with my wife.</p></div>
+        </article>
+        <article class="person-card">
+          <img src="images/eli.png" alt="Eli Fantasia">
+          <div><h3>Eli Fantasia</h3><p>I am a Software Engineer major at BYU-Idaho. I enjoy working out, hiking, and spending time with friends.</p></div>
+        </article>
+        <article class="person-card">
+          <img src="images/spencer.jpeg" alt="Spencer Smith">
+          <div><h3>Spencer Smith</h3><p>I am a Computer Science Major at BYU-Idaho. I enjoy hanging out with friends and watching movies!</p></div>
+        </article>
+      </section>
+
+      <section class="mission-card" aria-labelledby="mission-title">
+        <h2 id="mission-title">Our Mission</h2>
+        <p>We are a group of students stationed here in Rexburg Idaho. We are devoted to helping people find fun activities to attend while staying or visiting Rexburg. We hope to help others find that Rexburg does have things to do year round.</p>
+      </section>
+      </div>
+      <div class="sub" id="set-prefs" hidden>
+      <button type="button" class="back" data-back>← Settings</button>
+      <section class="settings-card">
+        <h2>Preferences</h2>
+        <p class="section-sub">Choose your defaults for the Explore page.</p>
+        <form class="account-form" id="pref-form">
+          <label>Default way of getting there<select id="pref-mode"><option value="drive">Drive</option><option value="bike">Bike</option><option value="walk">Walk</option></select></label>
+          <label>Default time available: <span id="pref-hrs-l">3 hr</span><input type="range" id="pref-hrs" min="1" max="12" value="3"></label>
+          <button type="submit">Apply to Explore</button>
+        </form>
+        <p class="account-status" id="pref-status" aria-live="polite"></p>
+      </section>
+      </div>
+      <div class="sub" id="set-notif" hidden>
+      <button type="button" class="back" data-back>← Settings</button>
+      <section class="settings-card">
+        <h2>Notifications</h2>
+        <p class="section-sub">Pick what you would like to hear about.</p>
+        <div class="tglist">
+          <label class="tg">Reminders for scheduled activities<input type="checkbox" checked></label>
+          <label class="tg">Get-together invites<input type="checkbox" checked></label>
+          <label class="tg">New activities in Rexburg<input type="checkbox"></label>
+        </div>
+        <p class="account-note">Notifications are display-only placeholders right now. Nothing is sent or saved.</p>
+      </section>
+      </div>
+      <div class="sub" id="set-help" hidden>
+      <button type="button" class="back" data-back>← Settings</button>
+      <section class="settings-card">
+        <h2>Help</h2>
+        <p class="section-sub">Tips for using Rexburg's Greatest.</p>
+        <p><b>Finding something to do.</b> Use the time slider and filters on Explore, or search by name.</p>
+        <p><b>Planning.</b> Tap Schedule activity on any card, or use the Get Together tab to build an invite for friends.</p>
+        <p><b>Hours and seasons.</b> These are typical, so confirm before you go.</p>
+      </section>
+      </div>
+      <div class="sub" id="set-logout" hidden>
+      <button type="button" class="back" data-back>← Settings</button>
+      <section class="settings-card">
+        <h2>Log out</h2>
+        <p class="section-sub">Sign out of your account on this device.</p>
+        <form class="account-form" id="logout-form"><button type="submit">Log out</button></form>
+        <p class="account-note">Accounts are display-only placeholders right now, so there is nothing to sign out of yet.</p>
+        <p class="account-status" id="logout-status" aria-live="polite"></p>
+      </section>
+      </div>
+    </main>
+  </div>
+
+  <nav class="nav" role="tablist" aria-label="Sections">
+    <button role="tab" data-tab="explore" aria-selected="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h10"/></svg>Explore</button>
+    <button role="tab" data-tab="map" aria-selected="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M12 21s7-6.2 7-11a7 7 0 1 0-14 0c0 4.8 7 11 7 11z"/><circle cx="12" cy="10" r="2.5"/></svg>Map</button>
+    <button role="tab" data-tab="schedule" aria-selected="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="5" width="16" height="15" rx="2"/><path d="M4 10h16M9 3v4M15 3v4"/></svg>Schedule Activities</button>
+    <button role="tab" data-tab="together" aria-selected="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3"/><circle cx="17" cy="9" r="2.5"/><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6M15 14.5c3 0 6 1.8 6 5.5"/></svg>Get Together</button>
+    <button role="tab" data-tab="settings" aria-selected="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>Settings</button>
+  </nav>
+</div>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+<script>
+/* ===== PHOTOS =====
+   To add a photo, paste an image link between the quotes on that place's line.
+   Example:  'Porter Park': 'https://example.com/porter-park.jpg',
+   You can also use a file saved next to this page:  'Porter Park': 'porter-park.jpg',
+   Leave it empty ('') to show the "Photo coming soon" placeholder. */
+const PHOTOS={
+ 'Devotional at the BYU-I Center':'images/places/byui-center.jpg',
+ 'Porter Park':'images/places/porter-park.png',
+ 'Teton Flood Museum':'images/places/teton-museum.jpg',
+ 'Rexburg Idaho Temple grounds':'images/places/temple.jpg',
+ 'Rexburg Rapids':'images/places/rexburg-rapids.jpeg',
+ 'Beaver Dick Park':'images/places/beaver-dick.jpg',
+ 'Menan Buttes':'images/places/menan-buttes.jpeg',
+ 'Teton Dam site overlook':'images/places/teton-dam.jpg',
+ 'St. Anthony Sand Dunes':'images/places/sand-dunes.jpg',
+ 'Ririe Reservoir':'images/places/ririe-reservoir.jpg',
+ 'Heise Hot Springs':'images/places/heise-hot-springs.jpg',
+ 'Kelly Canyon':'images/places/kelly-canyon.jpg',
+ 'Upper Mesa Falls':'images/places/upper-mesa-falls.jpg',
+ 'Grand Targhee':'images/places/grand-targhee.jpg',
+ 'Yellowstone West Entrance':'images/places/yellowstone-west-entrance.jpg'
+};
+/* ===== END PHOTOS ===== */
+const C={lat:43.8183,lng:-111.7835};
+const CATS={outdoors:['Outdoors','#374151','#E5E7EB','⛰️'],water:['Water','#6B7280','#F3F4F6','💦'],winter:['Winter','#111827','#E5E7EB','⛷️'],town:['Town and campus','#4B5563','#E5E7EB','🎓'],trip:['Day trips','#9CA3AF','#F3F4F6','🦬']};
+const MAP_COLORS={outdoors:'#2F855A',water:'#1479A8',winter:'#4C5D9B',town:'#C4662D',trip:'#8B5E34'};
+const MODES={walk:'Walk',bike:'Bike',drive:'Drive'};
+const DAYS=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+const PLACE_SITES={
+ 'Devotional at the BYU-I Center':'https://www.byui.edu/speeches/devotionals',
+ 'Porter Park':'https://www.rexburg.id.gov/o/parksrecreation/page/porter-park',
+ 'Teton Flood Museum':'https://www.rexburg.org/o/arts/page/museum-of-rexburg',
+ 'Rexburg Idaho Temple grounds':'https://www.churchofjesuschrist.org/temples/details/rexburg-idaho-temple?lang=eng',
+ 'Rexburg Rapids':'https://www.rexburgid.gov/o/rapids/page/hours-admission',
+ 'Beaver Dick Park':'https://yellowstoneteton.com/listings/beaver-dick-park',
+ 'Menan Buttes':'https://www.blm.gov/visit/north-menan-butte-trail',
+ 'Teton Dam site overlook':'https://www.usbr.gov/newsroom/news-release/5353?field_story=1',
+ 'St. Anthony Sand Dunes':'https://www.blm.gov/visit/st-anthony-sand-dunes',
+ 'Ririe Reservoir':'https://www.recreation.gov/camping/gateways/120',
+ 'Heise Hot Springs':'https://heiseresort.com/',
+ 'Kelly Canyon':'https://kellycanyonresort.com/',
+ 'Upper Mesa Falls':'https://visitidaho.org/things-to-do/natural-attractions/mesa-falls/',
+ 'Grand Targhee':'https://www.grandtarghee.com/',
+ 'Yellowstone West Entrance':'https://home.nps.gov/places/000/west-entrance-station.htm'
+};
+const A=[
+['Devotional at the BYU-I Center','town',43.8183,-111.7835,'Free',1,[2],[11.5,12.5],null,'Weekly campus devotional. Confirm the schedule at byui.edu.'],
+['Porter Park','town',43.8236,-111.7890,'Free',1.5,null,[6,22],null,'Downtown park with lawns and a pavilion. Good for frisbee or a picnic.'],
+['Teton Flood Museum','town',43.8250,-111.7904,'$',1,null,null,null,'The story of the 1976 Teton Dam collapse and the flood through Rexburg.'],
+['Rexburg Idaho Temple grounds','town',43.8107,-111.7791,'Free',0.75,null,[6,22],null,'Quiet grounds that are good for a walk.'],
+['Rexburg Rapids','water',43.8200,-111.7970,'$',2,null,null,null,'Indoor aquatic center with pools and slides.'],
+['Beaver Dick Park','water',43.8650,-111.8300,'Free',2,null,[6,22],null,'Henrys Fork riverside for fishing, floating and picnics.'],
+['Menan Buttes','outdoors',43.7830,-111.9700,'Free',2.5,null,[6,21],null,'Huge volcanic tuff cones. The climb gives a view across the Snake River plain.'],
+['Teton Dam site overlook','outdoors',43.9140,-111.5420,'Free',1.5,null,[6,21],null,'Overlook at the place the dam failed in 1976.'],
+['St. Anthony Sand Dunes','outdoors',43.9500,-111.9100,'Free',3,null,[7,21],null,'Sandboarding and riding on the dunes. Bring your own gear.'],
+['Ririe Reservoir','water',43.5880,-111.7280,'$',4,null,[7,21],[5,9],'Boating, swimming and camping.'],
+['Heise Hot Springs','water',43.6680,-111.6620,'$',3,null,null,null,'Hot spring pools and a water slide.'],
+['Kelly Canyon','winter',43.6000,-111.6500,'$$',4,null,null,[12,3],'Small ski hill with night skiing and tubing.'],
+['Upper Mesa Falls','outdoors',44.1750,-111.2630,'$',3,null,[8,19],[5,10],'A 110-foot waterfall on the Henrys Fork with boardwalk overlooks. The road closes with snow.'],
+['Grand Targhee','winter',43.7880,-110.9590,'$$',8,null,null,null,'Ski and snowboard resort on the Wyoming side of the Tetons, with summer hiking.'],
+['Yellowstone West Entrance','trip',44.6590,-111.0970,'$$',10,null,[6,21],null,'A full-day trip. Entrance fee is charged per vehicle.']
+].map((a,i)=>{const o={id:i,name:a[0],cat:a[1],lat:a[2],lng:a[3],cost:a[4],dur:a[5],days:a[6],hrs:a[7],season:a[8],note:a[9]};
+ const R=Math.PI/180,dLa=(o.lat-C.lat)*R,dLn=(o.lng-C.lng)*R;
+ const h=Math.sin(dLa/2)**2+Math.cos(C.lat*R)*Math.cos(o.lat*R)*Math.sin(dLn/2)**2;
+ o.mi=3958.8*2*Math.asin(Math.sqrt(h));
+ o.brg=Math.atan2(dLn*Math.cos(C.lat*R),dLa);
+ return o});
+function mins(mi,mode){const r=mi*1.3;
+ if(mode==='walk')return r/3*60;
+ if(mode==='bike')return r/10*60;
+ return r/(mi<5?25:mi<30?45:55)*60+3}
+function fmt(m){m=Math.round(m);return m<60?m+' min':Math.floor(m/60)+' hr '+(m%60?m%60+' min':'')}
+function clock(h){const hh=Math.floor(h),mm=Math.round((h-hh)*60),ap=hh>=12?'pm':'am';return ((hh+11)%12+1)+(mm?':'+String(mm).padStart(2,'0'):'')+ap}
+const S={mode:'drive',cat:null,free:false,day:0,budget:3,sel:null};
+function nowBoise(){try{const p=new Intl.DateTimeFormat('en-US',{timeZone:'America/Boise',weekday:'short',hour:'numeric',minute:'numeric',hour12:false,month:'numeric'}).formatToParts(new Date());
+ const g=t=>p.find(x=>x.type===t).value;return{day:['Sun','Mon','Tue','Wed','Thu','Fri','Sat'].indexOf(g('weekday')),h:(+g('hour')%24)+(+g('minute'))/60,mo:+g('month')}}catch(e){const d=new Date();return{day:d.getDay(),h:d.getHours()+d.getMinutes()/60,mo:d.getMonth()+1}}}
+const NOW=nowBoise();S.day=NOW.day;
+function inSeason(a){if(!a.season)return true;const[s,e]=a.season,m=NOW.mo;return s<=e?(m>=s&&m<=e):(m>=s||m<=e)}
+function status(a){
+ if(!inSeason(a))return{ok:false,t:'Out of season'};
+ if(a.days&&!a.days.includes(S.day))return{ok:false,t:'Not on '+DAYS[S.day]+'s'};
+ if(!a.hrs)return{ok:true,t:'Check hours before you go'};
+ const t=clock(a.hrs[0])+' to '+clock(a.hrs[1]);
+ if(S.day===NOW.day&&NOW.h>=a.hrs[0]&&NOW.h<a.hrs[1])return{ok:true,t:t,now:true};
+ return{ok:true,t:t}}
+function compute(){return A.map(a=>{const m=mins(a.mi,S.mode),st=status(a),total=2*m+a.dur*60;
+ const vis=(!S.cat||a.cat===S.cat)&&(!S.free||a.cost==='Free')&&(!S.q||(a.name+' '+a.note).toLowerCase().includes(S.q));
+ return{a,m,st,total,vis,fit:st.ok&&total<=S.budget*60}}).filter(x=>x.vis).sort((p,q)=>(q.fit-p.fit)||p.m-q.m)}
+function esc(s){return String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]))}
+function render(){
+ const rows=compute();
+ document.getElementById('bl').textContent=S.budget+' hr';
+ const L=document.getElementById('list');
+ if(!rows.length){L.innerHTML='<p class="empty">Nothing matches. Turn off a filter to see more.</p>'}
+ else L.innerHTML=rows.map(card).join('');
+ drawMap(rows);summary(rows)}
+function card(r){const a=r.a,c=CATS[a.cat][1],title=esc(a.name),site='<a class="site-chip" href="'+PLACE_SITES[a.name]+'" target="_blank" rel="noopener">Website</a>';
+  const why=!r.st.ok?r.st.t:(!r.fit?'Needs '+fmt(r.total)+' round trip with the visit':'');
+  const url='https://www.google.com/maps/dir/?api=1&origin='+C.lat+','+C.lng+'&destination='+a.lat+','+a.lng+'&travelmode=driving';
+  return '<article class="item'+(r.fit?'':' off')+(S.sel===a.id?' sel':'')+'" style="--c:'+c+'" data-id="'+a.id+'" id="i'+a.id+'">'+
+  photo(a)+'<div class="t">'+fmt(r.m)+'<small>'+MODES[S.mode].toLowerCase()+', '+(a.mi<10?a.mi.toFixed(1):Math.round(a.mi))+' mi</small>'+site+'</div>'+
+  '<div><h2><span class="em" style="background:'+CATS[a.cat][2]+'">'+CATS[a.cat][3]+'</span>'+title+'</h2><p>'+esc(a.note)+'</p><div class="meta"><span><b>'+CATS[a.cat][0]+'</b></span><span>'+a.cost+'</span><span>Plan on '+a.dur+' hr there</span>'+ 
+  '<span'+(r.st.now?' class="now"':'')+'>'+(r.st.now?'Open now, ':'')+r.st.t+'</span></div>'+
+  (why?'<div class="meta"><span>'+esc(why)+'</span></div>':'')+
+  '<div class="btns"><a class="go" href="'+url+'" target="_blank" rel="noopener">Get directions</a><button type="button" class="go sched" data-sched="'+a.id+'">Schedule activity</button></div></div></article>'}
+const ZOOMS={town:['Town',3],near:['Nearby',15],region:['Region',45],far:['Far',90]};
+S.zoom='region';S.tab='explore';S.rad=45;S.px=0;S.py=0;
+let LAST=[];
+
+function photo(a){const u=(PHOTOS[a.name]||'').trim();return '<div class="ph" role="img" aria-label="'+esc(a.name)+'"><div class="ph-empty"><span aria-hidden="true">📷</span>Photo coming soon</div>'+(u?'<img src="'+esc(u)+'" alt="'+esc(a.name)+'" loading="lazy" onerror="this.remove()">':'')+'</div>'}
+const PLAIN=[[44.15,-112.4],[44.15,-111.55],[43.85,-111.45],[43.5,-111.6],[43.25,-111.8],[43.25,-112.4]];
+const FOREST=[[44.9,-111.7],[44.9,-110.6],[43.3,-110.6],[43.3,-111.3],[43.7,-111.35],[44.0,-111.5],[44.4,-111.7]];
+const RIVERS=[[[44.6,-111.37],[44.42,-111.36],[44.07,-111.45],[43.97,-111.68],[43.9,-111.82],[43.8,-111.93],[43.76,-111.98]],
+ [[43.72,-111.15],[43.8,-111.3],[43.9,-111.45],[43.88,-111.65],[43.86,-111.8]],
+ [[43.55,-111.5],[43.67,-111.66],[43.72,-111.85],[43.76,-111.98]],
+ [[43.76,-111.98],[43.62,-112.04],[43.49,-112.05],[43.3,-112.15]]];
+const ROADS=[[[43.4917,-112.034],[43.65,-111.95],[43.82,-111.79],[43.966,-111.684],[44.07,-111.449],[44.42,-111.38],[44.662,-111.104]],
+ [[43.3,-112.05],[43.4917,-112.03],[43.72,-112.12],[44.17,-112.23],[44.5,-112.25]],
+ [[43.82,-111.79],[43.76,-111.5],[43.723,-111.111]]];
+const LAKES=[[43.588,-111.728,1.8,0.5],[44.42,-111.36,2.6,1.4],[44.6,-111.35,2.8,1.8]];
+const RIDGES=[[-110.88,43.55,44.0],[-111.4,43.35,43.75]];
+const TOWNS=[['Idaho Falls',43.4917,-112.034],['St. Anthony',43.966,-111.684],['Ashton',44.07,-111.449],['Driggs',43.723,-111.111],['Island Park',44.42,-111.38],['West Yellowstone',44.662,-111.104]];
+function terrain(W,H,cx,cy,k,mpd,rad){
+ const P=(la,ln)=>[cx+(ln-C.lng)*mpd*k,cy-(la-C.lat)*69*k];
+ const q=a=>a.map(p=>P(p[0],p[1]));
+ const poly=a=>q(a).map(p=>p[0].toFixed(1)+','+p[1].toFixed(1)).join(' ');
+ const smooth=a=>{const z=q(a);let d='M'+z[0][0].toFixed(1)+' '+z[0][1].toFixed(1);
+  for(let i=1;i<z.length-1;i++){d+=' Q'+z[i][0].toFixed(1)+' '+z[i][1].toFixed(1)+' '+((z[i][0]+z[i+1][0])/2).toFixed(1)+' '+((z[i][1]+z[i+1][1])/2).toFixed(1)}
+  const l=z[z.length-1];return d+' L'+l[0].toFixed(1)+' '+l[1].toFixed(1)};
+ let s='<defs><linearGradient id="land" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#E6ECD8"/><stop offset="1" stop-color="#D2DFC3"/></linearGradient></defs>';
+ s+='<rect width="'+W+'" height="'+H+'" fill="url(#land)"/>';
+ s+='<polygon points="'+poly(PLAIN)+'" fill="#DDE8C8" opacity=".8"/>';
+ s+='<polygon points="'+poly(FOREST)+'" fill="#B7D2A6" opacity=".75"/>';
+ LAKES.forEach(l=>{const c=P(l[0],l[1]);s+='<ellipse cx="'+c[0].toFixed(1)+'" cy="'+c[1].toFixed(1)+'" rx="'+Math.max(3,l[2]*k).toFixed(1)+'" ry="'+Math.max(2,l[3]*k).toFixed(1)+'" fill="#7DB7E6" stroke="#5FA0D8" stroke-width="1.5"/>'});
+ RIVERS.forEach(r=>{s+='<path d="'+smooth(r)+'" fill="none" stroke="#7DB7E6" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/>'});
+ ROADS.forEach((r,i)=>{const d=smooth(r);s+='<path d="'+d+'" fill="none" stroke="#FBF7EA" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/><path d="'+d+'" fill="none" stroke="'+(i===1?'#E79A86':'#E3B567')+'" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>'});
+ const tri=[];
+ RIDGES.forEach(r=>{const n=Math.round((r[2]-r[1])/0.05);for(let i=0;i<=n;i++){const la=r[1]+(r[2]-r[1])*i/n,ln=r[0]+Math.sin(i*1.7)*0.02,p=P(la,ln);tri.push([p[0],p[1],9+((i*7)%5)*2])}});
+ tri.sort((a,b)=>a[1]-b[1]).forEach(t=>{const x=t[0].toFixed(1),y=t[1],z=t[2];
+  s+='<polygon points="'+(t[0]-z).toFixed(1)+','+(y+z*.6).toFixed(1)+' '+x+','+(y-z*.9).toFixed(1)+' '+(t[0]+z).toFixed(1)+','+(y+z*.6).toFixed(1)+'" fill="#8A94A3"/>'+
+  '<polygon points="'+(t[0]-z).toFixed(1)+','+(y+z*.6).toFixed(1)+' '+x+','+(y-z*.9).toFixed(1)+' '+x+','+(y+z*.6).toFixed(1)+'" fill="#AAB3BF"/>'+
+  '<polygon points="'+(t[0]-z*.28).toFixed(1)+','+(y-z*.45).toFixed(1)+' '+x+','+(y-z*.9).toFixed(1)+' '+(t[0]+z*.28).toFixed(1)+','+(y-z*.45).toFixed(1)+'" fill="#fff"/>'});
+ TOWNS.forEach(t=>{const p=P(t[1],t[2]);if(p[0]>14&&p[0]<W-100&&p[1]>34&&p[1]<H-14)s+='<circle cx="'+p[0].toFixed(1)+'" cy="'+p[1].toFixed(1)+'" r="3.5" fill="#6B7280" stroke="#fff" stroke-width="1.5"/><text x="'+(p[0]+7).toFixed(1)+'" y="'+(p[1]+4).toFixed(1)+'" font-size="11" font-style="italic" fill="#4B5563" stroke="#F4F7EC" stroke-width="3" paint-order="stroke">'+esc(t[0])+'</text>'});
+ return s}
+function drawMap(rows){
+ LAST=rows;
+ const W=520,H=560,cx=W/2+(S.px||0),cy=H/2+(S.py||0),rad=S.rad||45,k=230/rad,mpd=69.17*Math.cos(C.lat*Math.PI/180);
+ const step=[0.5,1,2,5,10,15,30,60].find(n=>n>=rad/4)||60;
+ let s=terrain(W,H,cx,cy,k,mpd,rad);
+ for(let i=Math.ceil(-cx/(step*k));i<=Math.floor((W-cx)/(step*k));i++){const x=cx+i*step*k;s+='<line x1="'+x+'" y1="0" x2="'+x+'" y2="'+H+'" stroke="#fff" stroke-width="1" opacity=".3"/>'}
+ for(let i=Math.ceil(-cy/(step*k));i<=Math.floor((H-cy)/(step*k));i++){const y=cy+i*step*k;s+='<line x1="0" y1="'+y+'" x2="'+W+'" y2="'+y+'" stroke="#fff" stroke-width="1" opacity=".3"/>'}
+ const pos=a=>({x:cx+(a.lng-C.lng)*mpd*k,y:cy-(a.lat-C.lat)*69*k});
+ const inView=rows.filter(r=>{const q=pos(r.a);return q.x>14&&q.x<W-14&&q.y>34&&q.y<H-14});
+ const out=rows.length-inView.length;
+ const lab=inView.length<=6;
+ inView.slice().sort((p,q)=>pos(p.a).y-pos(q.a).y).forEach(r=>{const a=r.a,q=pos(a),c=CATS[a.cat][1],on=S.sel===a.id,sc=on?1.35:1;
+  s+='<g data-id="'+a.id+'" style="cursor:pointer" opacity="'+(r.fit?1:.4)+'" tabindex="0" role="button" aria-label="'+esc(a.name)+'"><circle cx="'+q.x+'" cy="'+(q.y-14)+'" r="22" fill="transparent"/>'+
+  '<path transform="translate('+q.x+','+q.y+') scale('+sc+')" d="M0 0 L-7 -11 A9 9 0 1 1 7 -11 Z" fill="'+c+'" stroke="#fff" stroke-width="2"/><text x="'+q.x+'" y="'+(q.y-16*sc+4*sc)+'" text-anchor="middle" font-size="'+(11*sc)+'">'+CATS[a.cat][3]+'</text>'+
+  ((on||lab)?'<text x="'+(q.x>W-150?q.x-14:q.x+14)+'" y="'+(q.y-12)+'" text-anchor="'+(q.x>W-150?'end':'start')+'" font-size="13" font-weight="800" fill="var(--ink)" stroke="#F4F7EC" stroke-width="4" paint-order="stroke">'+esc(a.name)+'</text>':'')+'</g>'});
+ s+='<circle cx="'+cx+'" cy="'+cy+'" r="9" fill="var(--ember)" stroke="#fff" stroke-width="3"/><text x="'+(cx+14)+'" y="'+(cy+5)+'" font-size="13" font-weight="800" fill="var(--ink)" stroke="#F4F7EC" stroke-width="4" paint-order="stroke">BYU-Idaho</text>';
+ s+='<g transform="translate(20,'+(H-24)+')"><line x2="'+(step*k)+'" stroke="var(--ink)" stroke-width="3"/><text y="-8" font-size="12" font-weight="600" fill="var(--ink)">'+step+' mi</text></g>';
+ s+='<text x="'+(W-10)+'" y="'+(H-10)+'" text-anchor="end" font-size="10" fill="#5B6472">Illustrative terrain</text>';
+ s+='<g transform="translate('+(W-28)+',44)"><path d="M0 -14 L7 6 L0 2 L-7 6Z" fill="var(--ink)"/><text y="22" text-anchor="middle" font-size="12" font-weight="800" fill="var(--ink)">N</text></g>';
+ if(out)s+='<text x="'+cx+'" y="'+(H-10)+'" text-anchor="middle" font-size="12" fill="var(--muted)">'+out+' more outside this view</text>';
+ document.getElementById('map').innerHTML=s;document.getElementById('recenter').hidden=!(S.px||S.py);
+ const sh=document.getElementById('sheet'),r=rows.find(x=>x.a.id===S.sel);
+ sh.innerHTML=r?card(r)+'<button class="go2" id="tolist">Show in list</button>':'<span style="color:var(--muted)">Tap a pin to see details.</span>'}
+let leafletMap=null,leafletLayer=null;
+function drawMap(rows){
+ LAST=rows;
+ const el=document.getElementById('real-map');
+ if(!el.offsetWidth||!el.offsetHeight)return;
+ if(!leafletMap){
+  leafletMap=L.map(el,{scrollWheelZoom:true}).setView([C.lat,C.lng],10);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'&copy; OpenStreetMap contributors'}).addTo(leafletMap);
+  leafletLayer=L.layerGroup().addTo(leafletMap);
+ }
+ leafletLayer.clearLayers();
+ const bounds=[[C.lat,C.lng]];
+ const campusIcon=L.divIcon({className:'map-marker-wrap',html:'<div class="map-pin map-pin-campus"><span>🎓</span></div>',iconSize:[38,46],iconAnchor:[19,46],popupAnchor:[0,-42]});
+ L.marker([C.lat,C.lng],{title:'BYU-Idaho',icon:campusIcon}).bindPopup('<div class="map-popup"><strong>BYU-Idaho</strong><span>Starting point</span></div>').addTo(leafletLayer);
+ rows.forEach(r=>{
+  const a=r.a;
+  const directions='https://www.google.com/maps/dir/?api=1&origin='+C.lat+','+C.lng+'&destination='+a.lat+','+a.lng+'&travelmode=driving';
+  const photo=PHOTOS[a.name] ? '<img src="'+PHOTOS[a.name]+'" alt="'+esc(a.name)+'">' : '';
+  const popup='<div class="map-popup">'+photo+'<strong>'+esc(a.name)+'</strong><div class="map-popup-actions"><a href="'+PLACE_SITES[a.name]+'" target="_blank" rel="noopener">Website</a><a href="'+directions+'" target="_blank" rel="noopener">Directions</a></div></div>';
+  const icon=L.divIcon({className:'map-marker-wrap',html:'<div class="map-pin" style="background:'+MAP_COLORS[a.cat]+'"><span>'+CATS[a.cat][3]+'</span></div>',iconSize:[38,46],iconAnchor:[19,46],popupAnchor:[0,-42]});
+  L.marker([a.lat,a.lng],{title:a.name,icon:icon}).bindPopup(popup).addTo(leafletLayer);
+  bounds.push([a.lat,a.lng]);
+ });
+ leafletMap.fitBounds(bounds,{padding:[24,24],maxZoom:10});
+}
+function summary(rows){document.getElementById('sum').innerHTML=rows.filter(r=>r.fit).length+' of '+rows.length+' fit your '+S.budget+' hr <span>by '+MODES[S.mode].toLowerCase()+' on '+DAYS[S.day]+'</span>'}
+function pick(id){S.sel=id;render()}
+const TABS=['explore','map','schedule','together','settings'];
+function setTab(t){S.tab=t;TABS.forEach(k=>{document.getElementById('v-'+k).hidden=k!==t});
+ if(t==='map')setTimeout(()=>{drawMap(LAST);if(leafletMap)leafletMap.invalidateSize()},0);
+ document.querySelectorAll('.nav button').forEach(b=>b.setAttribute('aria-selected',b.dataset.tab===t));document.getElementById('v-'+t).scrollTop=0;if(t==='settings')showSet('menu')}
+function showSet(id){['menu','account','prefs','notif','about','help','logout'].forEach(k=>{document.getElementById('set-'+k).hidden=k!==id});document.getElementById('v-settings').scrollTop=0}
+document.getElementById('v-settings').addEventListener('click',e=>{const o=e.target.closest('[data-set]'),b=e.target.closest('[data-back]');
+ if(o){document.getElementById('logout-status').textContent='';showSet(o.dataset.set)}else if(b)showSet('menu')});
+function chips(id,items,key){const el=document.getElementById(id);
+ el.innerHTML=items.map(([k,l])=>'<button class="chip" data-k="'+k+'" aria-pressed="'+(S[key]===(k==='all'?null:k))+'">'+l+'</button>').join('');
+ el.onclick=e=>{const b=e.target.closest('button');if(!b)return;S[key]=b.dataset.k==='all'?null:b.dataset.k;if(key==='zoom'){S.px=0;S.py=0;S.rad=ZOOMS[S.zoom][1]}chips(id,items,key);render()}}
+chips('modes',[['walk','🚶 Walk'],['bike','🚲 Bike'],['drive','🚗 Drive']],'mode');
+chips('cats',[['all','Everything'],...Object.entries(CATS).map(([k,v])=>[k,v[3]+' '+v[0]])],'cat');
+document.getElementById('day').innerHTML=DAYS.map((d,i)=>'<option value="'+i+'"'+(i===S.day?' selected':'')+'>'+(i===NOW.day?'Today, ':'')+d+'</option>').join('');
+document.getElementById('day').onchange=e=>{S.day=+e.target.value;render()};
+document.getElementById('budget').oninput=e=>{S.budget=+e.target.value;render()};
+document.getElementById('free').onclick=e=>{S.free=!S.free;e.currentTarget.setAttribute('aria-pressed',S.free);render()};
+document.addEventListener('click',e=>{const b=e.target.closest('button[data-sched]');if(!b)return;
+ document.getElementById('sched-act').value=b.dataset.sched;document.getElementById('sched-status').textContent='';setTab('schedule')});
+document.getElementById('list').onclick=e=>{if(e.target.closest('a')||e.target.closest('button[data-sched]'))return;const it=e.target.closest('.item');if(it){S.sel=+it.dataset.id;render()}};
+document.getElementById('sheet').onclick=e=>{if(e.target.id==='tolist'){setTab('explore');const el=document.getElementById('i'+S.sel);if(el)el.scrollIntoView({block:'center'})}};
+document.querySelector('.nav').onclick=e=>{const b=e.target.closest('button');if(b)setTab(b.dataset.tab)};
+chips('zoom',Object.entries(ZOOMS).map(([k,v])=>[k,v[0]]),'zoom');
+document.getElementById('map').onclick=e=>{if(MOVED){MOVED=false;return}const g=e.target.closest('g[data-id]');if(g)pick(+g.dataset.id)};
+let DRAG=null,MOVED=false,RAF=0,PINCH=null;const PTR=new Map();
+const mapEl=document.getElementById('map');
+const ZITEMS=Object.entries(ZOOMS).map(([k,v])=>[k,v[0]]);
+function clampPan(){const L=Math.max(350,130*230/S.rad);S.px=Math.max(-L,Math.min(L,S.px||0));S.py=Math.max(-L,Math.min(L,S.py||0))}
+function viewPt(x,y){const r=mapEl.getBoundingClientRect(),sc=Math.min(r.width/520,r.height/560)||1;return[(x-(r.left+r.width/2))/sc,(y-(r.top+r.height/2))/sc]}
+function redraw(){if(!RAF)RAF=requestAnimationFrame(()=>{RAF=0;drawMap(LAST)})}
+function unpreset(){if(S.zoom){S.zoom=null;chips('zoom',ZITEMS,'zoom')}}
+function setZoom(rad,vx,vy){rad=Math.max(1.5,Math.min(120,rad));const r=S.rad/rad;
+ S.px=vx+((S.px||0)-vx)*r;S.py=vy+((S.py||0)-vy)*r;S.rad=rad;clampPan();unpreset();redraw()}
+mapEl.addEventListener('pointerdown',e=>{PTR.set(e.pointerId,{x:e.clientX,y:e.clientY});
+ if(PTR.size===2){const[a,b]=[...PTR.values()],m=viewPt((a.x+b.x)/2,(a.y+b.y)/2);
+  PINCH={d0:Math.hypot(a.x-b.x,a.y-b.y)||1,rad0:S.rad,px0:S.px||0,py0:S.py||0,mx:m[0],my:m[1]};DRAG=null;MOVED=true;return}
+ MOVED=false;DRAG={x:e.clientX,y:e.clientY,px:S.px||0,py:S.py||0,id:e.pointerId}});
+mapEl.addEventListener('pointermove',e=>{if(PTR.has(e.pointerId))PTR.set(e.pointerId,{x:e.clientX,y:e.clientY});
+ if(PINCH&&PTR.size>=2){const[a,b]=[...PTR.values()],d=Math.hypot(a.x-b.x,a.y-b.y)||1;
+  const rad=Math.max(1.5,Math.min(120,PINCH.rad0*PINCH.d0/d)),r=PINCH.rad0/rad;
+  S.rad=rad;S.px=PINCH.mx+(PINCH.px0-PINCH.mx)*r;S.py=PINCH.my+(PINCH.py0-PINCH.my)*r;clampPan();unpreset();redraw();return}
+ if(!DRAG||e.pointerId!==DRAG.id)return;
+ const dx=e.clientX-DRAG.x,dy=e.clientY-DRAG.y;
+ if(!MOVED){if(Math.hypot(dx,dy)<6)return;MOVED=true;try{mapEl.setPointerCapture(e.pointerId)}catch(_){}}
+ const r=mapEl.getBoundingClientRect(),sc=Math.min(r.width/520,r.height/560)||1;
+ S.px=DRAG.px+dx/sc;S.py=DRAG.py+dy/sc;clampPan();redraw()});
+['pointerup','pointercancel'].forEach(n=>mapEl.addEventListener(n,e=>{PTR.delete(e.pointerId);if(PTR.size<2)PINCH=null;DRAG=null}));
+mapEl.addEventListener('wheel',e=>{e.preventDefault();const v=viewPt(e.clientX,e.clientY);setZoom(S.rad*Math.exp(e.deltaY*0.0015),v[0],v[1])},{passive:false});
+document.getElementById('zin').onclick=()=>{if(leafletMap)leafletMap.zoomIn()};
+document.getElementById('zout').onclick=()=>{if(leafletMap)leafletMap.zoomOut()};
+document.getElementById('recenter').onclick=()=>{if(leafletMap)leafletMap.setView([C.lat,C.lng],10)};
+document.getElementById('map').onkeydown=e=>{if(e.key==='Enter'||e.key===' '){const g=e.target.closest('g[data-id]');if(g){e.preventDefault();pick(+g.dataset.id)}}};
+const CATITEMS=()=>[['all','Everything'],...Object.entries(CATS).map(([k,v])=>[k,v[3]+' '+v[0]])];
+document.getElementById('ftoggle').onclick=e=>{const b=e.currentTarget,open=b.getAttribute('aria-expanded')!=='true';b.setAttribute('aria-expanded',open);document.getElementById('fpanel').hidden=!open};
+document.getElementById('reset').onclick=()=>{Object.assign(S,{mode:'drive',cat:null,free:false,day:NOW.day,budget:3});
+ document.getElementById('budget').value=3;document.getElementById('day').value=NOW.day;document.getElementById('free').setAttribute('aria-pressed','false');
+ chips('modes',[['walk','🚶 Walk'],['bike','🚲 Bike'],['drive','🚗 Drive']],'mode');chips('cats',CATITEMS(),'cat');render()};
+
+/* Schedule Activities + Get Together */
+const actOpts=A.map(a=>'<option value="'+a.id+'">'+esc(a.name)+'</option>').join('');
+const dayOpts=DAYS.map((d,i)=>'<option value="'+i+'"'+(i===NOW.day?' selected':'')+'>'+d+'</option>').join('');
+['sched-act','gt-act'].forEach(id=>document.getElementById(id).innerHTML=actOpts);
+['sched-day','gt-day'].forEach(id=>document.getElementById(id).innerHTML=dayOpts);
+function t12(v){const[h,m]=v.split(':').map(Number);return clock(h+m/60)}
+const PLANS=[];
+function drawPlans(){
+ const el=document.getElementById('sched-list');
+ el.innerHTML=PLANS.length?PLANS.map((p,i)=>'<div class="plan"><div><b>'+esc(A[p.act].name)+'</b><small>'+DAYS[p.day]+' at '+t12(p.time)+'</small></div><button data-i="'+i+'">Remove</button></div>').join(''):'<p class="empty" style="padding:12px">Nothing scheduled yet.</p>'}
+document.getElementById('sched-form').addEventListener('submit',e=>{e.preventDefault();
+ PLANS.push({act:+document.getElementById('sched-act').value,day:+document.getElementById('sched-day').value,time:document.getElementById('sched-time').value});
+ PLANS.sort((a,b)=>a.day-b.day||a.time.localeCompare(b.time));drawPlans();
+ document.getElementById('sched-status').textContent='Added to your schedule.'});
+document.getElementById('sched-list').onclick=e=>{const b=e.target.closest('button[data-i]');if(b){PLANS.splice(+b.dataset.i,1);drawPlans()}};
+drawPlans();
+let INVITE='';
+document.getElementById('gt-form').addEventListener('submit',e=>{e.preventDefault();
+ const a=A[+document.getElementById('gt-act').value],note=document.getElementById('gt-note').value.trim();
+ INVITE='You\u2019re invited to '+document.getElementById('gt-name').value.trim()+'!\n'+a.name+'\n'+DAYS[+document.getElementById('gt-day').value]+' at '+t12(document.getElementById('gt-time').value)+(note?'\n'+note:'')+"\nPlanned with Rexburg's Greatest";
+ const box=document.getElementById('gt-invite');box.textContent=INVITE;box.hidden=false;document.getElementById('gt-copy').hidden=false;document.getElementById('gt-status').textContent=''});
+document.getElementById('gt-copy').onclick=()=>{
+ const done=()=>document.getElementById('gt-status').textContent='Invite copied.';
+ if(navigator.clipboard)navigator.clipboard.writeText(INVITE).then(done,()=>document.getElementById('gt-status').textContent='Select the text above to copy it.');
+ else document.getElementById('gt-status').textContent='Select the text above to copy it.'};
+
+document.getElementById('logout-form').addEventListener('submit',e=>{e.preventDefault();document.getElementById('logout-status').textContent='You have been logged out.'});
+document.getElementById('q').oninput=e=>{S.q=e.target.value.trim().toLowerCase();render()};
+document.getElementById('pref-hrs').oninput=e=>{document.getElementById('pref-hrs-l').textContent=e.target.value+' hr'};
+document.getElementById('pref-form').addEventListener('submit',e=>{e.preventDefault();
+ S.mode=document.getElementById('pref-mode').value;S.budget=+document.getElementById('pref-hrs').value;
+ document.getElementById('budget').value=S.budget;
+ chips('modes',[['walk','🚶 Walk'],['bike','🚲 Bike'],['drive','🚗 Drive']],'mode');render();
+ document.getElementById('pref-status').textContent='Applied to Explore.'});
+function setAccountMode(mode){
+ const signup=mode==='signup';
+ document.getElementById('signup-form').hidden=!signup;
+ document.getElementById('login-form').hidden=signup;
+ document.getElementById('signup-tab').setAttribute('aria-pressed',String(signup));
+ document.getElementById('login-tab').setAttribute('aria-pressed',String(!signup));
+ document.getElementById('account-status').textContent='';
+}
+document.getElementById('signup-tab').onclick=()=>setAccountMode('signup');
+document.getElementById('login-tab').onclick=()=>setAccountMode('login');
+['signup-form','login-form'].forEach(id=>{
+ document.getElementById(id).addEventListener('submit',event=>{
+  event.preventDefault();
+  document.getElementById('account-status').textContent='This account feature is not connected yet. Your information has not been saved.';
+ });
+});
+const viewToggle=document.getElementById('view-toggle');
+viewToggle.onclick=()=>{
+ const browser=document.body.classList.toggle('browser-mode');
+ viewToggle.setAttribute('aria-pressed',String(browser));
+ viewToggle.textContent=browser?'Switch to app view':'Switch to browser view';
+};
+render();
+</script>
+</body>
+</html>

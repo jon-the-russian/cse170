@@ -7,11 +7,26 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="">
 <style>
 :root{--bg:#FFF8EC;--panel:#FFFFFF;--ink:#1B2A41;--muted:#66758A;--line:#F0E4CF;--brand:#2D7FF9;--ember:#FF5A4F;--ring:#BFE3CE;--mapbg:#E3F6EA;--shadow:0 2px 0 rgba(27,42,65,.04),0 8px 22px rgba(27,42,65,.10);color-scheme:light;box-sizing:border-box}
 *,*::before,*::after{box-sizing:border-box}
 html,body{height:100%}
 body{margin:0;background:#FFE9B8;color:var(--ink);font-family:"Bricolage Grotesque",system-ui,-apple-system,"Segoe UI",sans-serif;line-height:1.4;-webkit-text-size-adjust:100%;-webkit-tap-highlight-color:transparent}
+.view-switcher{position:fixed;top:14px;right:14px;z-index:20}
+.view-switcher button{border:2px solid #FFFFFF;border-radius:999px;background:#111827;color:#FFFFFF;padding:10px 15px;font-weight:800;box-shadow:0 5px 16px rgba(17,24,39,.25);cursor:pointer}
+.view-switcher button:hover{background:#374151}
+body.browser-mode{display:block;overflow:auto;background:#E5E7EB;padding:70px 24px 24px}
+body.browser-mode .app{max-width:1400px;width:100%;height:calc(100dvh - 94px);min-height:720px;border:0;border-radius:18px;box-shadow:0 12px 36px rgba(17,24,39,.22);display:grid;grid-template-rows:auto auto minmax(0,1fr)}
+body.browser-mode .bar{grid-row:1;border-radius:0;padding-left:32px}
+body.browser-mode .nav{grid-row:2;display:flex;justify-content:center;gap:12px;border-top:0;border-bottom:2px solid var(--line);padding:10px 18px}
+body.browser-mode .nav button{min-width:130px}
+body.browser-mode .view{grid-row:3;min-height:0;overflow-y:auto}
+body.browser-mode #v-explore{padding:0 24px 24px}
+body.browser-mode .fbar,body.browser-mode .welcome,body.browser-mode .food-recommendations,body.browser-mode .sum,body.browser-mode .foot{max-width:1320px;margin-left:auto;margin-right:auto}
+body.browser-mode #list{max-width:1320px;margin-left:auto;margin-right:auto;grid-template-columns:repeat(3,minmax(0,1fr))}
+body.browser-mode .item{height:100%}
+body.browser-mode .item-photo{height:210px}
 a{color:var(--brand)}
 button,select,input,textarea{font:inherit;color:inherit}
 :focus-visible{outline:3px solid var(--brand);outline-offset:2px}
@@ -46,7 +61,11 @@ input[type=range]{flex:1;min-width:120px;height:36px;accent-color:var(--ember)}
 .item.off{opacity:.55}
 .t{display:inline-flex;align-items:baseline;gap:8px;background:var(--c);color:#fff;border-radius:999px;padding:6px 14px;font-weight:800;font-size:1.05rem;margin-bottom:10px}
 .t small{font-size:.8rem;font-weight:600;color:#fff;opacity:.95;margin:0}
+.site-chip{display:inline-block;color:#fff;text-decoration:none;background:rgba(255,255,255,.2);border:1px solid rgba(255,255,255,.7);border-radius:999px;padding:3px 8px;font-size:.75rem;font-weight:800}
+.site-chip:hover,.site-chip:focus-visible{background:#fff;color:var(--ink)}
 .item h2{margin:0 0 4px;font-size:1.25rem;font-weight:800;display:flex;align-items:center;gap:10px}
+.place-link{color:inherit;text-decoration:none}
+.place-link:hover,.place-link:focus-visible{text-decoration:underline}
 .em{flex:none;width:38px;height:38px;border-radius:12px;display:grid;place-items:center;font-size:1.3rem}
 .item p{margin:0 0 10px;color:var(--muted);font-size:.95rem}
 .meta{display:flex;flex-wrap:wrap;gap:4px 12px;font-size:.88rem;margin-bottom:4px}
@@ -58,6 +77,25 @@ input[type=range]{flex:1;min-width:120px;height:36px;accent-color:var(--ember)}
 .zoom{padding:12px 12px 0}
 .zoom .scroll{margin:0 -12px;padding:2px 12px}
 .mapbox{flex:1;min-height:200px;margin:12px;background:var(--mapbg);border-radius:24px;box-shadow:var(--shadow);overflow:hidden}
+.mapbox #real-map{width:100%;height:100%;min-height:420px}
+.mapbox #real-map .leaflet-container{font:inherit;background:#E8EEF0}
+.mapbox #real-map .leaflet-tile-pane{filter:saturate(.78) brightness(1.04)}
+.mapbox #map{display:none}
+.map-marker-wrap{background:transparent;border:0}
+.map-pin{width:38px;height:38px;display:grid;place-items:center;border:3px solid #fff;border-radius:50% 50% 50% 8px;transform:rotate(-45deg);box-shadow:0 5px 12px rgba(17,24,39,.28);color:#fff;font-size:1rem}
+.map-pin span{transform:rotate(45deg);line-height:1}
+.map-pin-campus{background:#374151;border-radius:50%}
+.map-popup{width:210px;overflow:hidden;color:#111827}
+.map-popup img{display:block;width:100%;height:92px;object-fit:cover;border-radius:12px;margin-bottom:9px}
+.map-popup strong{display:block;font-size:1rem;line-height:1.2;margin-bottom:7px}
+.map-popup-actions{display:flex;gap:6px;flex-wrap:wrap}
+.map-popup-actions a{display:inline-block;padding:7px 9px;border-radius:999px;background:#374151;color:#fff;text-decoration:none;font-size:.78rem;font-weight:800}
+.map-popup-actions a:hover,.map-popup-actions a:focus-visible{background:#C4662D}
+.map-legend{position:absolute;z-index:500;right:14px;top:14px;width:178px;padding:12px 14px;border:1px solid rgba(255,255,255,.8);border-radius:18px;background:rgba(255,255,255,.92);box-shadow:0 8px 22px rgba(17,24,39,.18);color:#111827}
+.map-legend h3{margin:0 0 8px;font-size:.82rem;text-transform:uppercase;letter-spacing:.08em;color:#5B6472}
+.map-legend-list{display:grid;gap:7px}
+.map-legend-item{display:flex;align-items:center;gap:8px;font-size:.82rem;font-weight:700}
+.map-legend-dot{width:14px;height:14px;border-radius:50%;flex:none;box-shadow:0 0 0 2px #fff,0 1px 4px rgba(17,24,39,.25)}
 #map{width:100%;height:100%;display:block;touch-action:none;cursor:grab;user-select:none;-webkit-user-select:none}
 #map:active{cursor:grabbing}
 .mapbox{position:relative}
@@ -122,10 +160,16 @@ select{min-width:0}
 .food-intro{margin:0 0 14px;color:var(--muted);font-size:.92rem}
 .food-list{display:grid;gap:10px;margin:0;padding:0;list-style:none}
 .food-card{padding:13px;background:#fff;border:2px solid #D1D5DB;border-radius:18px}
-.food-card h3{margin:0 0 4px;font-size:1.05rem}
+.food-card h3{display:flex;align-items:center;gap:8px;margin:0 0 4px;font-size:1.05rem}
+.food-card h3 a{color:inherit;text-decoration:none}
+.food-card h3 a:hover,.food-card h3 a:focus-visible{text-decoration:underline}
 .food-card p{margin:4px 0;color:var(--muted);font-size:.88rem}
 .food-meta{display:flex;flex-wrap:wrap;gap:5px 12px;margin-top:8px;font-size:.84rem}
 .food-meta a{font-weight:700;color:#111827}
+.food-website{display:inline-block;padding:2px 8px;border-radius:999px;background:#E5E7EB;color:#111827!important;text-decoration:none}
+.food-website:hover,.food-website:focus-visible{background:#D1D5DB;text-decoration:underline}
+.food-directions{display:inline-grid;width:30px;height:30px;place-items:center;border-radius:50%;background:#374151;color:#fff!important;text-decoration:none;font-size:1.05rem;line-height:1;flex:none}
+.food-directions:hover,.food-directions:focus-visible{background:#C4662D}
 .food-price{font-weight:800;color:#374151}
 .plan{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:12px;border-radius:14px;background:#fff;border:2px solid var(--line)}
 .plan b{display:block}
@@ -196,6 +240,7 @@ button.go{border:0;cursor:pointer}
 </style>
 </head>
 <body>
+<div class="view-switcher"><button type="button" id="view-toggle" aria-pressed="false">Switch to browser view</button></div>
 <div class="app">
   <header class="bar"><h1>Rexburg's Greatest</h1><span>Find something fun near BYU-Idaho</span></header>
 
@@ -209,36 +254,36 @@ button.go{border:0;cursor:pointer}
       <button id="reset">Reset filters</button>
     </section>
     <section class="welcome" aria-label="Welcome">
-      <p>Welcome to Rexburg! Of all the college towns in the US, you chose the best one. Some of the best activities to do are all around. Whether you have moved here for work, school, or to raise a family, this place is perfect. We have assembled some of the greatest attractions that are near you here in Rexburg, all depending on the amount of time you have.</p>
+      <p>Welcome to Rexburg! Whether you’re here for school, work, or family, there’s always something fun nearby. Explore activities based on how much time you have.</p>
     </section>
     <section class="food-recommendations" aria-labelledby="food-title">
       <h2 id="food-title">Top 5 budget-friendly food spots</h2>
       <p class="food-intro">Good local choices for students and visitors. Prices and hours can change, so contact the restaurant before you go.</p>
       <ol class="food-list">
         <li class="food-card">
-          <h3>1. Rusty Taco</h3>
+          <h3>1. <a href="https://rustytaco.com/" target="_blank" rel="noopener">Rusty Taco</a><a class="food-directions" href="https://www.google.com/maps/dir/?api=1&amp;origin=43.8183,-111.7835&amp;destination=1055+S+12th+W+Rexburg+ID&amp;travelmode=driving" target="_blank" rel="noopener" aria-label="Driving directions to Rusty Taco" title="Driving directions">↗</a></h3>
           <p>Street tacos, breakfast, and bowls with several affordable options near campus.</p>
-          <div class="food-meta"><span class="food-price">$</span><span>1055 S 12th W</span><a href="tel:+12086093492">(208) 609-3492</a><a href="https://www.google.com/maps/search/?api=1&amp;query=Rusty+Taco+1055+South+12th+West+Rexburg+ID" target="_blank" rel="noopener">Directions</a></div>
+          <div class="food-meta"><span class="food-price">$</span><span>1055 S 12th W</span><a href="tel:+12086093492">(208) 609-3492</a><a class="food-website" href="https://rustytaco.com/" target="_blank" rel="noopener">Website</a></div>
         </li>
         <li class="food-card">
-          <h3>2. Costa Vida</h3>
+          <h3>2. <a href="https://www.costavida.com/" target="_blank" rel="noopener">Costa Vida</a><a class="food-directions" href="https://www.google.com/maps/dir/?api=1&amp;origin=43.8183,-111.7835&amp;destination=485+N+2nd+E+Rexburg+ID&amp;travelmode=driving" target="_blank" rel="noopener" aria-label="Driving directions to Costa Vida" title="Driving directions">↗</a></h3>
           <p>Fresh Mexican food with tacos, bowls, nachos, and other quick meal options.</p>
-          <div class="food-meta"><span class="food-price">$</span><span>485 N 2nd E</span><a href="tel:+12083567733">(208) 356-7733</a><a href="https://www.google.com/maps/search/?api=1&amp;query=Costa+Vida+485+North+2nd+East+Rexburg+ID" target="_blank" rel="noopener">Directions</a></div>
+          <div class="food-meta"><span class="food-price">$</span><span>485 N 2nd E</span><a href="tel:+12083567733">(208) 356-7733</a><a class="food-website" href="https://www.costavida.com/" target="_blank" rel="noopener">Website</a></div>
         </li>
         <li class="food-card">
-          <h3>3. Righteous Slice</h3>
+          <h3>3. <a href="https://righteousslice.com/" target="_blank" rel="noopener">Righteous Slice</a><a class="food-directions" href="https://www.google.com/maps/dir/?api=1&amp;origin=43.8183,-111.7835&amp;destination=175+W+2nd+S+Suite+100+Rexburg+ID&amp;travelmode=driving" target="_blank" rel="noopener" aria-label="Driving directions to Righteous Slice" title="Driving directions">↗</a></h3>
           <p>Artisan pizza by the slice, making it easy to choose a filling meal on a budget.</p>
-          <div class="food-meta"><span class="food-price">$</span><span>175 W 2nd S, Suite 100</span><a href="tel:+12088204597">(208) 820-4597</a><a href="https://www.google.com/maps/search/?api=1&amp;query=Righteous+Slice+175+West+2nd+South+Rexburg+ID" target="_blank" rel="noopener">Directions</a></div>
+          <div class="food-meta"><span class="food-price">$</span><span>175 W 2nd S, Suite 100</span><a href="tel:+12088204597">(208) 820-4597</a><a class="food-website" href="https://righteousslice.com/" target="_blank" rel="noopener">Website</a></div>
         </li>
         <li class="food-card">
-          <h3>4. Blister's BBQ</h3>
+          <h3>4. <a href="https://blistersbbq.com/" target="_blank" rel="noopener">Blister's BBQ</a><a class="food-directions" href="https://www.google.com/maps/dir/?api=1&amp;origin=43.8183,-111.7835&amp;destination=26+E+Main+St+Rexburg+ID&amp;travelmode=driving" target="_blank" rel="noopener" aria-label="Driving directions to Blister's BBQ" title="Driving directions">↗</a></h3>
           <p>Hearty barbecue sandwiches and sides from a local restaurant with affordable choices.</p>
-          <div class="food-meta"><span class="food-price">$</span><span>26 E Main St</span><a href="tel:+12082439291">(208) 243-9291</a><a href="https://www.google.com/maps/search/?api=1&amp;query=Blisters+BBQ+26+East+Main+Street+Rexburg+ID" target="_blank" rel="noopener">Directions</a></div>
+          <div class="food-meta"><span class="food-price">$</span><span>26 E Main St</span><a href="tel:+12082439291">(208) 243-9291</a><a class="food-website" href="https://blistersbbq.com/" target="_blank" rel="noopener">Website</a></div>
         </li>
         <li class="food-card">
-          <h3>5. Big Jud's</h3>
+          <h3>5. <a href="https://www.bigjuds.com/" target="_blank" rel="noopener">Big Jud's</a><a class="food-directions" href="https://www.google.com/maps/dir/?api=1&amp;origin=43.8183,-111.7835&amp;destination=411+W+7800+S+Rexburg+ID&amp;travelmode=driving" target="_blank" rel="noopener" aria-label="Driving directions to Big Jud's" title="Driving directions">↗</a></h3>
           <p>A Rexburg-area burger favorite with generous portions, fries, and classic diner food.</p>
-          <div class="food-meta"><span class="food-price">$–$$</span><span>411 W 7800 S</span><a href="tel:+12083592833">(208) 359-2833</a><a href="https://www.google.com/maps/search/?api=1&amp;query=Big+Juds+411+West+7800+South+Rexburg+ID" target="_blank" rel="noopener">Directions</a></div>
+          <div class="food-meta"><span class="food-price">$–$$</span><span>411 W 7800 S</span><a href="tel:+12083592833">(208) 359-2833</a><a class="food-website" href="https://www.bigjuds.com/" target="_blank" rel="noopener">Website</a></div>
         </li>
       </ol>
     </section>
@@ -249,7 +294,7 @@ button.go{border:0;cursor:pointer}
 
   <div class="view" id="v-map" hidden>
     <div class="zoom"><div id="zoom" class="scroll"></div></div>
-    <div class="mapbox"><svg id="map" viewBox="0 0 520 560" role="img" aria-label="Map of activities around campus. Drag to move the map."></svg><button type="button" class="recenter" id="recenter" hidden>Recenter</button><div class="zbtns"><button type="button" id="zin" aria-label="Zoom in">+</button><button type="button" id="zout" aria-label="Zoom out">−</button></div></div>
+    <div class="mapbox"><div id="real-map" role="application" aria-label="Interactive map of activities around Rexburg"></div><div class="map-legend" aria-label="Map categories"><h3>Map key</h3><div class="map-legend-list"><div class="map-legend-item"><span class="map-legend-dot" style="background:#2F855A"></span>Outdoors</div><div class="map-legend-item"><span class="map-legend-dot" style="background:#1479A8"></span>Water</div><div class="map-legend-item"><span class="map-legend-dot" style="background:#4C5D9B"></span>Winter</div><div class="map-legend-item"><span class="map-legend-dot" style="background:#C4662D"></span>Town and campus</div><div class="map-legend-item"><span class="map-legend-dot" style="background:#8B5E34"></span>Day trips</div></div></div><svg id="map" viewBox="0 0 520 560" aria-hidden="true"></svg><button type="button" class="recenter" id="recenter" hidden>Recenter</button><div class="zbtns"><button type="button" id="zin" aria-label="Zoom in">+</button><button type="button" id="zout" aria-label="Zoom out">−</button></div></div>
     <div class="sheet" id="sheet"></div>
   </div>
 
@@ -415,6 +460,7 @@ button.go{border:0;cursor:pointer}
     <button role="tab" data-tab="settings" aria-selected="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>Settings</button>
   </nav>
 </div>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
 <script>
 /* ===== PHOTOS =====
    To add a photo, paste an image link between the quotes on that place's line.
@@ -441,13 +487,31 @@ const PHOTOS={
 /* ===== END PHOTOS ===== */
 const C={lat:43.8183,lng:-111.7835};
 const CATS={outdoors:['Outdoors','#374151','#E5E7EB','⛰️'],water:['Water','#6B7280','#F3F4F6','💦'],winter:['Winter','#111827','#E5E7EB','⛷️'],town:['Town and campus','#4B5563','#E5E7EB','🎓'],trip:['Day trips','#9CA3AF','#F3F4F6','🦬']};
+const MAP_COLORS={outdoors:'#2F855A',water:'#1479A8',winter:'#4C5D9B',town:'#C4662D',trip:'#8B5E34'};
 const MODES={walk:'Walk',bike:'Bike',drive:'Drive'};
 const DAYS=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+const PLACE_SITES={
+ 'Devotional at the BYU-I Center':'https://www.byui.edu/speeches/devotionals',
+ 'Porter Park':'https://www.rexburg.id.gov/o/parksrecreation/page/porter-park',
+ 'Teton Flood Museum':'https://www.rexburg.org/o/arts/page/museum-of-rexburg',
+ 'Rexburg Idaho Temple grounds':'https://www.churchofjesuschrist.org/temples/details/rexburg-idaho-temple?lang=eng',
+ 'Rexburg Rapids':'https://www.rexburgid.gov/o/rapids/page/hours-admission',
+ 'Beaver Dick Park':'https://yellowstoneteton.com/listings/beaver-dick-park',
+ 'Menan Buttes':'https://www.blm.gov/visit/north-menan-butte-trail',
+ 'Teton Dam site overlook':'https://www.usbr.gov/newsroom/news-release/5353?field_story=1',
+ 'St. Anthony Sand Dunes':'https://www.blm.gov/visit/st-anthony-sand-dunes',
+ 'Ririe Reservoir':'https://www.recreation.gov/camping/gateways/120',
+ 'Heise Hot Springs':'https://heiseresort.com/',
+ 'Kelly Canyon':'https://kellycanyonresort.com/',
+ 'Upper Mesa Falls':'https://visitidaho.org/things-to-do/natural-attractions/mesa-falls/',
+ 'Grand Targhee':'https://www.grandtarghee.com/',
+ 'Yellowstone West Entrance':'https://home.nps.gov/places/000/west-entrance-station.htm'
+};
 const A=[
 ['Devotional at the BYU-I Center','town',43.8183,-111.7835,'Free',1,[2],[11.5,12.5],null,'Weekly campus devotional. Confirm the schedule at byui.edu.'],
 ['Porter Park','town',43.8236,-111.7890,'Free',1.5,null,[6,22],null,'Downtown park with lawns and a pavilion. Good for frisbee or a picnic.'],
 ['Teton Flood Museum','town',43.8250,-111.7904,'$',1,null,null,null,'The story of the 1976 Teton Dam collapse and the flood through Rexburg.'],
-['Rexburg Idaho Temple grounds','town',43.8365,-111.7770,'Free',0.75,null,[6,22],null,'Quiet grounds that are good for a walk.'],
+['Rexburg Idaho Temple grounds','town',43.8107,-111.7791,'Free',0.75,null,[6,22],null,'Quiet grounds that are good for a walk.'],
 ['Rexburg Rapids','water',43.8200,-111.7970,'$',2,null,null,null,'Indoor aquatic center with pools and slides.'],
 ['Beaver Dick Park','water',43.8650,-111.8300,'Free',2,null,[6,22],null,'Henrys Fork riverside for fishing, floating and picnics.'],
 ['Menan Buttes','outdoors',43.7830,-111.9700,'Free',2.5,null,[6,21],null,'Huge volcanic tuff cones. The climb gives a view across the Snake River plain.'],
@@ -494,12 +558,12 @@ function render(){
  if(!rows.length){L.innerHTML='<p class="empty">Nothing matches. Turn off a filter to see more.</p>'}
  else L.innerHTML=rows.map(card).join('');
  drawMap(rows);summary(rows)}
-function card(r){const a=r.a,c=CATS[a.cat][1];
+function card(r){const a=r.a,c=CATS[a.cat][1],title=esc(a.name),site='<a class="site-chip" href="'+PLACE_SITES[a.name]+'" target="_blank" rel="noopener">Website</a>';
   const why=!r.st.ok?r.st.t:(!r.fit?'Needs '+fmt(r.total)+' round trip with the visit':'');
-  const url='https://www.google.com/maps/dir/?api=1&origin='+C.lat+','+C.lng+'&destination='+a.lat+','+a.lng+'&travelmode='+(S.mode==='bike'?'bicycling':S.mode==='walk'?'walking':'driving');
+  const url='https://www.google.com/maps/dir/?api=1&origin='+C.lat+','+C.lng+'&destination='+a.lat+','+a.lng+'&travelmode=driving';
   return '<article class="item'+(r.fit?'':' off')+(S.sel===a.id?' sel':'')+'" style="--c:'+c+'" data-id="'+a.id+'" id="i'+a.id+'">'+
-  photo(a)+'<div class="t">'+fmt(r.m)+'<small>'+MODES[S.mode].toLowerCase()+', '+(a.mi<10?a.mi.toFixed(1):Math.round(a.mi))+' mi</small></div>'+
-  '<div><h2><span class="em" style="background:'+CATS[a.cat][2]+'">'+CATS[a.cat][3]+'</span>'+esc(a.name)+'</h2><p>'+esc(a.note)+'</p><div class="meta"><span><b>'+CATS[a.cat][0]+'</b></span><span>'+a.cost+'</span><span>Plan on '+a.dur+' hr there</span>'+
+  photo(a)+'<div class="t">'+fmt(r.m)+'<small>'+MODES[S.mode].toLowerCase()+', '+(a.mi<10?a.mi.toFixed(1):Math.round(a.mi))+' mi</small>'+site+'</div>'+
+  '<div><h2><span class="em" style="background:'+CATS[a.cat][2]+'">'+CATS[a.cat][3]+'</span>'+title+'</h2><p>'+esc(a.note)+'</p><div class="meta"><span><b>'+CATS[a.cat][0]+'</b></span><span>'+a.cost+'</span><span>Plan on '+a.dur+' hr there</span>'+
   '<span'+(r.st.now?' class="now"':'')+'>'+(r.st.now?'Open now, ':'')+r.st.t+'</span></div>'+
   (why?'<div class="meta"><span>'+esc(why)+'</span></div>':'')+
   '<div class="btns"><a class="go" href="'+url+'" target="_blank" rel="noopener">Get directions</a><button type="button" class="go sched" data-sched="'+a.id+'">Schedule activity</button></div></div></article>'}
@@ -565,10 +629,36 @@ function drawMap(rows){
  document.getElementById('map').innerHTML=s;document.getElementById('recenter').hidden=!(S.px||S.py);
  const sh=document.getElementById('sheet'),r=rows.find(x=>x.a.id===S.sel);
  sh.innerHTML=r?card(r)+'<button class="go2" id="tolist">Show in list</button>':'<span style="color:var(--muted)">Tap a pin to see details.</span>'}
+let leafletMap=null,leafletLayer=null;
+function drawMap(rows){
+ LAST=rows;
+ const el=document.getElementById('real-map');
+ if(!el.offsetWidth||!el.offsetHeight)return;
+ if(!leafletMap){
+  leafletMap=L.map(el,{scrollWheelZoom:true}).setView([C.lat,C.lng],10);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'&copy; OpenStreetMap contributors'}).addTo(leafletMap);
+  leafletLayer=L.layerGroup().addTo(leafletMap);
+ }
+ leafletLayer.clearLayers();
+ const bounds=[[C.lat,C.lng]];
+ const campusIcon=L.divIcon({className:'map-marker-wrap',html:'<div class="map-pin map-pin-campus"><span>🎓</span></div>',iconSize:[38,46],iconAnchor:[19,46],popupAnchor:[0,-42]});
+ L.marker([C.lat,C.lng],{title:'BYU-Idaho',icon:campusIcon}).bindPopup('<div class="map-popup"><strong>BYU-Idaho</strong><span>Starting point</span></div>').addTo(leafletLayer);
+ rows.forEach(r=>{
+  const a=r.a;
+  const directions='https://www.google.com/maps/dir/?api=1&origin='+C.lat+','+C.lng+'&destination='+a.lat+','+a.lng+'&travelmode=driving';
+  const photo=PHOTOS[a.name] ? '<img src="'+PHOTOS[a.name]+'" alt="'+esc(a.name)+'">' : '';
+  const popup='<div class="map-popup">'+photo+'<strong>'+esc(a.name)+'</strong><div class="map-popup-actions"><a href="'+PLACE_SITES[a.name]+'" target="_blank" rel="noopener">Website</a><a href="'+directions+'" target="_blank" rel="noopener">Directions</a></div></div>';
+  const icon=L.divIcon({className:'map-marker-wrap',html:'<div class="map-pin" style="background:'+MAP_COLORS[a.cat]+'"><span>'+CATS[a.cat][3]+'</span></div>',iconSize:[38,46],iconAnchor:[19,46],popupAnchor:[0,-42]});
+  L.marker([a.lat,a.lng],{title:a.name,icon:icon}).bindPopup(popup).addTo(leafletLayer);
+  bounds.push([a.lat,a.lng]);
+ });
+ leafletMap.fitBounds(bounds,{padding:[24,24],maxZoom:10});
+}
 function summary(rows){document.getElementById('sum').innerHTML=rows.filter(r=>r.fit).length+' of '+rows.length+' fit your '+S.budget+' hr <span>by '+MODES[S.mode].toLowerCase()+' on '+DAYS[S.day]+'</span>'}
 function pick(id){S.sel=id;render()}
 const TABS=['explore','map','schedule','together','settings'];
 function setTab(t){S.tab=t;TABS.forEach(k=>{document.getElementById('v-'+k).hidden=k!==t});
+ if(t==='map')setTimeout(()=>{drawMap(LAST);if(leafletMap)leafletMap.invalidateSize()},0);
  document.querySelectorAll('.nav button').forEach(b=>b.setAttribute('aria-selected',b.dataset.tab===t));document.getElementById('v-'+t).scrollTop=0;if(t==='settings')showSet('menu')}
 function showSet(id){['menu','account','prefs','notif','about','help','logout'].forEach(k=>{document.getElementById('set-'+k).hidden=k!==id});document.getElementById('v-settings').scrollTop=0}
 document.getElementById('v-settings').addEventListener('click',e=>{const o=e.target.closest('[data-set]'),b=e.target.closest('[data-back]');
@@ -613,9 +703,9 @@ mapEl.addEventListener('pointermove',e=>{if(PTR.has(e.pointerId))PTR.set(e.point
  S.px=DRAG.px+dx/sc;S.py=DRAG.py+dy/sc;clampPan();redraw()});
 ['pointerup','pointercancel'].forEach(n=>mapEl.addEventListener(n,e=>{PTR.delete(e.pointerId);if(PTR.size<2)PINCH=null;DRAG=null}));
 mapEl.addEventListener('wheel',e=>{e.preventDefault();const v=viewPt(e.clientX,e.clientY);setZoom(S.rad*Math.exp(e.deltaY*0.0015),v[0],v[1])},{passive:false});
-document.getElementById('zin').onclick=()=>setZoom(S.rad/1.5,0,0);
-document.getElementById('zout').onclick=()=>setZoom(S.rad*1.5,0,0);
-document.getElementById('recenter').onclick=()=>{S.px=0;S.py=0;render()};
+document.getElementById('zin').onclick=()=>{if(leafletMap)leafletMap.zoomIn();else setZoom(S.rad/1.5,0,0)};
+document.getElementById('zout').onclick=()=>{if(leafletMap)leafletMap.zoomOut();else setZoom(S.rad*1.5,0,0)};
+document.getElementById('recenter').onclick=()=>{if(leafletMap)leafletMap.setView([C.lat,C.lng],10);else{S.px=0;S.py=0;render()}};
 document.getElementById('map').onkeydown=e=>{if(e.key==='Enter'||e.key===' '){const g=e.target.closest('g[data-id]');if(g){e.preventDefault();pick(+g.dataset.id)}}};
 const CATITEMS=()=>[['all','Everything'],...Object.entries(CATS).map(([k,v])=>[k,v[3]+' '+v[0]])];
 document.getElementById('ftoggle').onclick=e=>{const b=e.currentTarget,open=b.getAttribute('aria-expanded')!=='true';b.setAttribute('aria-expanded',open);document.getElementById('fpanel').hidden=!open};
@@ -673,6 +763,13 @@ document.getElementById('login-tab').onclick=()=>setAccountMode('login');
   document.getElementById('account-status').textContent='This account feature is not connected yet. Your information has not been saved.';
  });
 });
+const viewToggle=document.getElementById('view-toggle');
+viewToggle.onclick=()=>{
+ const browser=document.body.classList.toggle('browser-mode');
+ viewToggle.setAttribute('aria-pressed',String(browser));
+ viewToggle.textContent=browser?'Switch to app view':'Switch to browser view';
+ if(browser&&S.tab==='map')setTimeout(()=>{if(leafletMap)leafletMap.invalidateSize()},0);
+};
 render();
 </script>
 </body>
